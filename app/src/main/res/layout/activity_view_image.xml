@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/img"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/home_img1"
+        android:scaleType="centerCrop"
+        android:contentDescription="@string/todo" />
+
+    <View
+        android:background="@drawable/image_shadow"
+        android:layout_width="match_parent"
+        android:layout_height="300dp" />
+
+    <RelativeLayout
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp">
+
+        <ImageView
+            android:id="@+id/profile"
+            android:background="@drawable/circle"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/profile2"
+            android:scaleType="centerCrop"
+            android:contentDescription="@string/todo" />
+
+        <LinearLayout android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            :layout_marginRight="5dp"
+            android:layout_centerInParent="true"
+            android:layout_toStartOf="@+id/close"
+            android:layout_toEndOf="@+id/profile">
+
+            <TextView
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/author"
+                android:fontFamily="@font/roboto_bold" />
+
+            <TextView
+                android:textSize="11sp"
+                android:textStyle="normal"
+                android:textColor="#ccffffff"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/author_id"
+                android:fontFamily="@font/roboto" />
+
+        </LinearLayout>
+
+        <Button
+            android:textColor="@color/white"
+            android:id="@+id/close"
+            android:background="@drawable/ic_close"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_centerInParent="true"
+            android:layout_alignParentEnd="true" />
+
+    </RelativeLayout>
+
+</FrameLayout>

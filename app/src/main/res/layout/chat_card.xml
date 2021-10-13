@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:background="@drawable/border_bottom"
+    android:padding="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/profile"
+        android:background="@drawable/circle"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@drawable/profile"
+        android:contentDescription="@string/todo" />
+
+    <LinearLayout
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp">
+
+        <TextView
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:id="@+id/name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/user"
+            android:lineSpacingExtra="3sp"
+            android:translationY="-1.38sp"
+            android:fontFamily="@font/roboto_bold" />
+
+        <TextView
+            android:textSize="13sp"
+            android:textStyle="normal"
+            android:textColor="@color/black"
+            android:id="@+id/recent_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/recent_message_example_text"
+            android:lineSpacingExtra="3sp"
+            android:translationY="-1.38sp"
+            android:fontFamily="@font/roboto" />
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">ImageGallery</string>
+    <string name="search_menu_title">Search</string>
+    <string name="status_bar_notification_info_overflow">999+</string>
+    <string name="author">Iron Man</string>
+    <string name="author_id">ironman@82</string>
+    <string name="email_hint">Email</string>
+    <string name="example_email">ksuth@example.com</string>
+    <string name="example_password">ksuth98</string>
+    <string name="log_in">Log In</string>
+    <string name="password_hint">Password</string>
+    <string name="register">Register</string>
+    <string name="title">photo</string>
+    <string name="todo">TODO</string>
+    <string name="all_results">All Results</string>
+    <string name="browse_all">Browse all</string>
+    <string name="chats">Chats</string>
+    <string name="discover">Discover</string>
+    <string name="follow_user">Follow Jane</string>
+    <string name="message">Message</string>
+    <string name="message_example_text_1">Really love your most recent photo. I\'ve been trying to capture the same thing for a few months and would love some tips!</string>
+    <string name="message_example_text_2">A fast 50mm like f1.8 would help with the bokeh. Iâ€™ve been using primes as they tend to get a bit sharper images.</string>
+    <string name="message_hint">Type a Message</string>
+    <string name="name_hint">Your Name</string>
+    <string name="next">Next</string>
+    <string name="recent_message_example_text">Thank you! That was very helpful!</string>
+    <string name="search">Search</string>
+    <string name="see_more">See More</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="tnc_text">By signing up, you agree to Photo\'s Terms of Service and Privacy Policy.</string>
+    <string name="user">Jane</string>
+    <string name="user_city">San Francisco, CA</string>
+    <string name="user_id">jane@123</string>
+    <string name="what_s_new_today">What\'s new today</string>
+</resources>

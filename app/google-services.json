@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "87197332648",
+    "project_id": "imagegallery-ks",
+    "storage_bucket": "imagegallery-ks.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:87197332648:android:2ba5b2e8a90dd9bebefe9d",
+        "android_client_info": {
+          "package_name": "com.mca.imagegallery"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "87197332648-7bmbeq9re63odisrbj9e8c83bp3gcggg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCq2ZRnFr592Q4rTVFIKOi7ZtNVrKaH3HU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "87197332648-7bmbeq9re63odisrbj9e8c83bp3gcggg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

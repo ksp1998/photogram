@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/bar"
+        android:background="@drawable/border_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true">
+
+        <Button
+            android:id="@+id/btn_back"
+            android:background="@drawable/ic_back"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentStart="true" />
+
+        <TextView
+            android:id="@+id/title"
+            android:text="@string/author"
+            style="@style/chat_title" />
+
+    </RelativeLayout>
+
+    <ScrollView
+        android:scrollbarSize="0dp"
+        android:visibility="visible"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="-6dp"
+        android:layout_marginBottom="6dp"
+        android:layout_above="@+id/chat_bar"
+        android:layout_below="@+id/bar">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:id="@+id/chat_card_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <include layout="@layout/message_sent"/>
+            <include layout="@layout/message_received"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <RelativeLayout
+        android:id="@+id/chat_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+
+        <EditText android:id="@+id/message_box"
+            android:layout_margin="2dp"
+            android:hint="@string/message_hint"
+            style="@style/input_text" />
+
+        <Button
+            android:id="@+id/btn_send"
+            android:background="@drawable/ic_send"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

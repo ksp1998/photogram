@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button style="@style/button_back"/>
+
+    <TextView
+        android:layout_margin="24dp"
+        android:text="@string/register"
+        style="@style/title" />
+
+    <EditText
+        android:id="@+id/et_name"
+        android:text="@string/user"
+        android:hint="@string/name_hint"
+        android:inputType="textPersonName"
+        style="@style/input_text" />
+
+    <EditText
+        android:id="@+id/et_email"
+        android:text="@string/example_email"
+        android:hint="@string/email_hint"
+        android:inputType="textEmailAddress"
+        style="@style/input_text" />
+
+    <EditText
+        android:id="@+id/et_password"
+        android:text="@string/example_password"
+        android:hint="@string/password_hint"
+        android:inputType="textPassword"
+        style="@style/input_text" />
+
+    <Button
+        android:id="@+id/btn_signup"
+        android:layout_marginLeft="24dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginRight="24dp"
+        android:layout_marginBottom="12dp"
+        android:text="@string/sign_up"
+        style="@style/button_dark" />
+
+    <TextView
+        android:textSize="13sp"
+        android:textColor="@color/black"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginVertical="12dp"
+        android:text="@string/tnc_text"
+        android:lineSpacingExtra="3sp"
+        android:translationY="1.38sp"
+        android:fontFamily="@font/roboto" />
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"/>
+
+</LinearLayout>

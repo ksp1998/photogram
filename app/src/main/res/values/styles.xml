@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="button_dark">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:background">@drawable/btn_register</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:fontFamily">@font/roboto_bold</item>
+    </style>
+
+    <style name="button_light">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:background">@drawable/btn_login</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:fontFamily">@font/roboto_bold</item>
+    </style>
+
+    <style name="button_back">
+        <item name="android:textSize">24sp</item>
+        <item name="android:id">@id/btn_back</item>
+        <item name="android:background">@drawable/ic_back</item>
+        <item name="android:layout_width">40dp</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:layout_margin">16dp</item>
+    </style>
+
+    <style name="input_text">
+        <item name="android:textSize">15sp</item>
+        <item name="android:background">@drawable/input_border</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:layout_marginHorizontal" tools:targetApi="o">24dp</item>
+        <item name="android:layout_marginVertical" tools:targetApi="o">12dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:inputType">text</item>
+        <item name="android:fontFamily">@font/roboto</item>
+    </style>
+
+    <style name="title">
+        <item name="android:textSize">36sp</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:fontFamily">@font/comfortaa</item>
+        <item name="android:letterSpacing">-0.01</item>
+    </style>
+
+    <style name="chat_title">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:gravity">left|center_horizontal|clip_horizontal</item>
+        <item name="android:background">@drawable/border_bottom</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:lineSpacingExtra">2sp</item>
+        <item name="android:translationY">-1.04sp</item>
+        <item name="android:fontFamily">@font/comfortaa</item>
+        <item name="android:letterSpacing">-0.02</item>
+    </style>
+
+    <style name="sub_title">
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:fontFamily">@font/roboto_bold</item>
+        <item name="android:letterSpacing">0.04</item>
+        <item name="textAllCaps">true</item>
+    </style>
+
+</resources>
