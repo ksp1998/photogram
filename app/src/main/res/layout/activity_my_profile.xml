@@ -1,15 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MyProfileActivity">
+
+    <RelativeLayout
+        android:id="@+id/bar"
+        android:background="@drawable/border_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true">
+
+        <Button
+            android:id="@+id/btn_logout"
+            android:background="@drawable/ic_logout"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="16dp"
+            android:tooltipText="@string/logout"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true" />
+
+        <TextView
+            android:id="@+id/title"
+            android:text="@string/profile"
+            style="@style/bar_title" />
+
+    </RelativeLayout>
 
     <ScrollView
-
         android:scrollbarSize="0dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
+        android:paddingHorizontal="16dp"
         android:visibility="visible"
+        android:layout_below="@+id/bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/menu">
@@ -21,33 +45,43 @@
             android:layout_height="wrap_content">
 
             <ImageView
+                android:id="@+id/iv_profile"
                 android:layout_width="128dp"
                 android:layout_height="128dp"
-                android:layout_marginTop="48dp"
+                android:layout_marginTop="24dp"
                 android:src="@drawable/profile"
-                android:contentDescription="@string/todo"/>
+                android:contentDescription="@string/todo" />
 
             <TextView
+                android:id="@+id/tv_name"
                 android:layout_marginTop="24dp"
                 android:layout_marginBottom="12dp"
-                android:text="@string/user" style="@style/title"/>
+                android:text="@string/user" style="@style/title" />
 
             <TextView
+                android:id="@+id/tv_city"
                 android:layout_marginBottom="24dp"
                 android:text="@string/user_city"
-                style="@style/sub_title"/>
+                style="@style/sub_title" />
+
+<!--            <Button-->
+<!--                android:id="@+id/btn_follow"-->
+<!--                android:layout_marginVertical="12dp"-->
+<!--                android:text="@string/follow_user"-->
+<!--                style="@style/button_dark" />-->
 
             <Button
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="12dp"
-                android:text="@string/follow_user"
-                style="@style/button_dark"/>
-
-            <Button
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="12dp"
+                android:id="@+id/btn_message"
+                android:layout_marginVertical="12dp"
                 android:text="@string/message"
-                style="@style/button_light"/>
+                style="@style/button_light"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/btn_edit"
+                android:layout_marginVertical="12dp"
+                android:text="@string/edit_profile"
+                style="@style/button_light" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -61,15 +95,13 @@
                     android:layout_height="match_parent"
                     android:layout_toStartOf="@+id/divider">
 
-                    <include layout="@layout/gallery_image"/>
-
                 </LinearLayout>
 
                 <View
                     android:id="@+id/divider"
                     android:layout_width="8dp"
                     android:layout_height="match_parent"
-                    android:layout_centerHorizontal="true"/>
+                    android:layout_centerHorizontal="true" />
 
                 <LinearLayout
                     android:orientation="vertical"
@@ -78,17 +110,24 @@
                     android:layout_height="match_parent"
                     android:layout_toEndOf="@+id/divider">
 
-                    <include layout="@layout/gallery_image"/>
-
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tv_no_photo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_below="@id/divider"
+                    android:text="@string/no_photos_yet"
+                    style="@style/sub_title" />
 
             </RelativeLayout>
 
-            <Button
-                android:layout_marginTop="32dp"
-                android:layout_marginBottom="32dp"
-                android:text="@string/see_more"
-                style="@style/button_light"/>
+<!--            <Button-->
+<!--                android:layout_marginTop="32dp"-->
+<!--                android:layout_marginBottom="32dp"-->
+<!--                android:text="@string/see_more"-->
+<!--                style="@style/button_light"/>-->
 
         </LinearLayout>
 

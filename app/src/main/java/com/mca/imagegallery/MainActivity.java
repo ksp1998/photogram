@@ -1,6 +1,7 @@
 package com.mca.imagegallery;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.widget.Button;
@@ -45,5 +46,15 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, "Press BACK again to exit", Toast.LENGTH_SHORT).show();
 
         new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        SharedPreferences sp = getSharedPreferences("shared_file", MODE_PRIVATE);
+        if(sp.getString("id", null) != null) {
+            Toast.makeText(this, "Logged In", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, HomeActivity.class));
+        }
     }
 }

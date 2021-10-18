@@ -2,36 +2,31 @@ package com.mca.imagegallery;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class SearchActivity extends AppCompatActivity {
-    Button btnAdd;
-    Button btnChat;
-    Button btnHome;
-    Button btnMyProfile;
-    Button btnSearch;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
-        btnHome = findViewById(R.id.btn_home);
-        btnSearch = findViewById(R.id.btn_search);
-        btnAdd = findViewById(R.id.btn_add);
-        btnChat = findViewById(R.id.btn_chat);
-        btnMyProfile = findViewById(R.id.btn_my_profile);
+        new NavMenu(this);
+    }
 
-        btnHome.setOnClickListener(view -> {
-            startActivity(new Intent(this, HomeActivity.class));
-        });
+    // override method to perform action on permission grant and revoke
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Permissions.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
 
-        btnChat.setOnClickListener(view -> {
-            startActivity(new Intent(this, ChatListActivity.class));
-        });
-
-        btnMyProfile.setOnClickListener(view -> {
-            startActivity(new Intent(this, MyProfileActivity.class));
-        });
+    // override method which will be called on when image is captured or selected
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        NavMenu.onActivityResult(requestCode, resultCode, data);
     }
 }

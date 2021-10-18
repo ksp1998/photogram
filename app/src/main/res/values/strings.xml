@@ -19,7 +19,7 @@
     <string name="follow_user">Follow Jane</string>
     <string name="message">Message</string>
     <string name="message_example_text_1">Really love your most recent photo. I\'ve been trying to capture the same thing for a few months and would love some tips!</string>
-    <string name="message_example_text_2">A fast 50mm like f1.8 would help with the bokeh. Iâ€™ve been using primes as they tend to get a bit sharper images.</string>
+    <string name="message_example_text_2">A fast 50mm like f1.8 would help with the bokeh. I\'ve been using primes as they tend to get a bit sharper images.</string>
     <string name="message_hint">Type a Message</string>
     <string name="name_hint">Your Name</string>
     <string name="next">Next</string>
@@ -32,4 +32,12 @@
     <string name="user_city">San Francisco, CA</string>
     <string name="user_id">jane@123</string>
     <string name="what_s_new_today">What\'s new today</string>
+    <string name="register_here">Register here</string>
+    <string name="login_here">Login here</string>
+    <string name="no_photos_yet">No photos yet!</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="update">Update</string>
+    <string name="city_hint">City, Country</string>
+    <string name="profile">Profile</string>
+    <string name="logout">Logout</string>
 </resources>

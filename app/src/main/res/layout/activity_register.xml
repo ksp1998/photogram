@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".RegisterActivity">
 
     <Button style="@style/button_back"/>
 
@@ -16,6 +17,13 @@
         android:id="@+id/et_name"
         android:text="@string/user"
         android:hint="@string/name_hint"
+        android:inputType="textPersonName"
+        style="@style/input_text" />
+
+    <EditText
+        android:id="@+id/et_city"
+        android:text="@string/user_city"
+        android:hint="@string/city_hint"
         android:inputType="textPersonName"
         style="@style/input_text" />
 
@@ -35,12 +43,23 @@
 
     <Button
         android:id="@+id/btn_signup"
-        android:layout_marginLeft="24dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginRight="24dp"
-        android:layout_marginBottom="12dp"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="32dp"
         android:text="@string/sign_up"
         style="@style/button_dark" />
+
+    <TextView
+        android:id="@+id/link_login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginVertical="16dp"
+        android:textSize="15sp"
+        android:textStyle="normal"
+        android:textColor="@color/link"
+        android:text="@string/login_here"
+        android:fontFamily="@font/roboto" />
 
     <TextView
         android:textSize="13sp"
@@ -48,7 +67,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="24dp"
-        android:layout_marginVertical="12dp"
+        android:layout_marginBottom="12dp"
         android:text="@string/tnc_text"
         android:lineSpacingExtra="3sp"
         android:translationY="1.38sp"

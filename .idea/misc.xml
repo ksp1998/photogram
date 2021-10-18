@@ -13,6 +13,7 @@
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/drawable/ic_back.xml" value="0.2703125" />
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/drawable/ic_close.xml" value="0.2703125" />
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/drawable/ic_launcher_background.xml" value="0.2703125" />
+        <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/drawable/ic_logout.xml" value="0.2703125" />
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/drawable/ic_send.xml" value="0.2703125" />
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/drawable/image_shadow.xml" value="0.14635416666666667" />
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/drawable/input_border.xml" value="0.2703125" />
@@ -23,8 +24,10 @@
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/drawable/menu_icon_user.xml" value="0.2703125" />
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/drawable/message_received_border.xml" value="0.2703125" />
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/drawable/message_sent_border.xml" value="0.2703125" />
+        <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/layout-v26/activity_my_profile.xml" value="0.25416666666666665" />
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/layout/activity_chat.xml" value="0.25416666666666665" />
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/layout/activity_chat_list.xml" value="0.25416666666666665" />
+        <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/layout/activity_edit_profile.xml" value="0.25416666666666665" />
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/layout/activity_home.xml" value="0.25416666666666665" />
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/layout/activity_login.xml" value="0.25416666666666665" />
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/layout/activity_main.xml" value="0.18055555555555555" />
@@ -37,6 +40,7 @@
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/layout/custom_dialog.xml" value="0.25416666666666665" />
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/layout/gallery_image.xml" value="0.25416666666666665" />
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/layout/home_card.xml" value="0.25416666666666665" />
+        <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/layout/image_pick_options.xml" value="0.25416666666666665" />
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/layout/image_shadow.xml" value="0.25416666666666665" />
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/layout/message_received.xml" value="0.25416666666666665" />
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/layout/message_sent.xml" value="0.25416666666666665" />
