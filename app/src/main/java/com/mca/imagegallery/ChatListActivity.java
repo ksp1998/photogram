@@ -2,7 +2,6 @@ package com.mca.imagegallery;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
@@ -10,8 +9,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class ChatListActivity extends AppCompatActivity {
-    LinearLayout chatCard;
-    LinearLayout chatCardContainer;
+    private LinearLayout chatCard;
+    private LinearLayout chatCardContainer;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,12 +25,10 @@ public class ChatListActivity extends AppCompatActivity {
 
     private void setChatList() {
         chatCardContainer.removeAllViews();
-        for (int i = 0; i < 10; i++) {
-            LinearLayout linearLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.chat_card, (ViewGroup) null);
+        for (int i = 0; i < 5; i++) {
+            LinearLayout linearLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.chat_card, null);
             chatCard = linearLayout;
-            linearLayout.setOnClickListener(view -> {
-                startActivity(new Intent(this, ChatActivity.class));
-            });
+            linearLayout.setOnClickListener(view -> startActivity(new Intent(this, ChatActivity.class)));
 
             chatCardContainer.addView(chatCard);
         }

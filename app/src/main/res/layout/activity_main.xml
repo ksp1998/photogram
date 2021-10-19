@@ -8,6 +8,7 @@
     tools:context=".MainActivity">
 
     <RelativeLayout
+        android:id="@+id/container"
         android:background="@drawable/back"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
@@ -23,11 +24,11 @@
             app:drawableStartCompat="@drawable/logo"
             style="@style/title" />
 
-        <include
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            layout="@layout/user_card" />
+<!--        <include-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_alignParentBottom="true"-->
+<!--            layout="@layout/user_card" />-->
 
     </RelativeLayout>
 

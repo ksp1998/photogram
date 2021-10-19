@@ -1,39 +1,68 @@
 package com.mca.imagegallery;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.squareup.picasso.Picasso;
 
 public class ViewImageActivity extends AppCompatActivity {
+
+    private ImageView ivProfile, imageView;
+    private TextView tvName, tvUserId;
     private Button close;
-    private ImageView imageView;
+    private RelativeLayout profileCard;
+    private String profile_url, name, city, email, image_url;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_image);
 
+        ivProfile = findViewById(R.id.iv_profile);
+        imageView = findViewById(R.id.image_view);
+        tvName = findViewById(R.id.tv_name);
+        tvUserId = findViewById(R.id.tv_user_id);
         close = findViewById(R.id.close);
-        imageView = findViewById(R.id.img);
+        profileCard = findViewById(R.id.profile_card);
 
-        close.setOnClickListener(view -> {
-            super.onBackPressed();
-        });
+        profile_url = getIntent().getStringExtra("profile_url");
+        name = getIntent().getStringExtra("name");
+        city = getIntent().getStringExtra("city");
+        email = getIntent().getStringExtra("email");
+        image_url = getIntent().getStringExtra("image_url");
+
+        close.setOnClickListener(view -> finish());
+        profileCard.setOnClickListener(view -> gotoProfile());
 
         loadImage();
     }
 
     private void loadImage() {
-        String url = getIntent().getStringExtra("url");
-        Picasso.get().load(url).into(imageView);
+        Picasso.get().load(profile_url).into(ivProfile);
+        tvName.setText(name);
+        tvUserId.setText(email.substring(0, email.lastIndexOf('.')));
+        Picasso.get().load(image_url).into(imageView);
+    }
 
-//        byte[] bytes = getIntent().getByteArrayExtra("image");
-//        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-//        imageView.setImageBitmap(bitmap);
+    private void gotoProfile() {
+        if(getIntent().getStringExtra("activity") != null) {
+            finish();
+            return;
+        }
+
+        Intent intent = new Intent(this, MyProfileActivity.class);
+        intent.putExtra("profile_url", profile_url);
+        intent.putExtra("name", name);
+        intent.putExtra("city", city);
+        intent.putExtra("email", email);
+        startActivity(intent);
     }
 }

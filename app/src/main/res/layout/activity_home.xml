@@ -34,12 +34,11 @@
                 android:visibility="visible"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="24dp">
+                android:layout_marginVertical="24dp">
 
                 <LinearLayout
-                    android:orientation="horizontal"
                     android:id="@+id/card_container"
+                    android:orientation="horizontal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="0dp"
@@ -53,8 +52,7 @@
             </HorizontalScrollView>
 
             <TextView
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
+                android:layout_marginStart="16dp"
                 android:text="@string/browse_all"
                 style="@style/sub_title"/>
 
@@ -66,10 +64,10 @@
                 android:layout_marginRight="16dp">
 
                 <LinearLayout
-                    android:orientation="vertical"
                     android:id="@+id/gallery_left"
+                    android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_toStartOf="@+id/divider">
 
                     <include layout="@layout/gallery_image"/>
@@ -83,10 +81,10 @@
                     android:layout_centerHorizontal="true"/>
 
                 <LinearLayout
-                    android:orientation="vertical"
                     android:id="@+id/gallery_right"
+                    android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_toEndOf="@+id/divider">
 
                     <include layout="@layout/gallery_image"/>

@@ -11,26 +11,24 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class ChatActivity extends AppCompatActivity {
 
-    private Button btnBack;
-    private Button btnSend;
-    LinearLayout chatContainer;
+    private TextView tvTitle;
+    private Button btnBack, btnSend;
+    private LinearLayout chatContainer;
     private EditText inputMessage;
-    TextView labelMessage;
     RelativeLayout messageCard;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
+        tvTitle = findViewById(R.id.tv_title);
         btnBack = findViewById(R.id.btn_back);
         btnSend = findViewById(R.id.btn_send);
         inputMessage =  findViewById(R.id.message_box);
         chatContainer = findViewById(R.id.chat_card_container);
 
-        btnBack.setOnClickListener(view -> {
-            super.onBackPressed();
-        });
-
+        tvTitle.setText(getIntent().getStringExtra("name"));
+        btnBack.setOnClickListener(view -> super.onBackPressed());
         btnSend.setOnClickListener(view -> sendMessage());
     }
 
@@ -38,9 +36,8 @@ public class ChatActivity extends AppCompatActivity {
         String message = inputMessage.getText().toString();
         RelativeLayout relativeLayout = (RelativeLayout) getLayoutInflater().inflate(R.layout.message_sent, (ViewGroup) null);
         messageCard = relativeLayout;
-        TextView textView = relativeLayout.findViewById(R.id.message);
-        labelMessage = textView;
-        textView.setText(message);
+        final TextView tvMessage  = relativeLayout.findViewById(R.id.message);
+        tvMessage.setText(message);
         chatContainer.addView(messageCard);
         inputMessage.setText("");
     }

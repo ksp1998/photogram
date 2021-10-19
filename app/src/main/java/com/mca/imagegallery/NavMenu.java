@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.MediaStore;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -24,6 +25,7 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -34,9 +36,11 @@ import java.util.Date;
 public class NavMenu {
 
     private static Activity activity;
-    private static AlertDialog dialog = null;
-    private static File file;
-    private static Uri imageUri;
+    public static AlertDialog dialog = null;
+    public static ProgressDialog pd;
+    public static File file;
+    public static Uri imageUri;
+    public static String url;
 
     public static final int CAMERA_REQUEST = 100;
     public static final int GALLERY_REQUEST = 101;
@@ -69,26 +73,14 @@ public class NavMenu {
             btnMyProfile.setOnClickListener(null);
         }
 
-        LinearLayout layout = (LinearLayout) activity.getLayoutInflater().inflate(R.layout.image_pick_options, (ViewGroup) null);
-        ImageView btnCamera  = layout.findViewById(R.id.btn_camera);
-        btnCamera.setOnClickListener(view -> openCamera());
-        ImageView btnGallery = layout.findViewById(R.id.btn_gallery);
-        btnGallery.setOnClickListener(view -> openGallery());
-
         btnAdd.setOnClickListener(view -> {
-
-            if(dialog == null) {
-                dialog = new AlertDialog.Builder(activity)
-                        .setTitle("Pick Action")
-                        .setIcon(R.drawable.ic_launcher_background)
-                        .setView(layout)
-                        .create();
-            }
+            dialog = Utilities.pickDialog(activity);
             dialog.show();
         });
     }
 
-    public static void openCamera() {
+    public static void openCamera(Activity activity) {
+        NavMenu.activity = activity;
         if(!Permissions.checkPermissions(activity)) {
             Permissions.requestPermissions();
         }
@@ -107,7 +99,8 @@ public class NavMenu {
         }
     }
 
-    public static void openGallery() {
+    public static void openGallery(Activity activity) {
+        NavMenu.activity = activity;
         if(!Permissions.checkPermissions(activity)) {
             Permissions.requestPermissions();
         }
@@ -120,72 +113,109 @@ public class NavMenu {
 
     protected static void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if(requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
-            uploadImage();
+            if(activity.getClass() != EditProfile.class) {
+                uploadImage();
+            }
         }
 
         if(requestCode == GALLERY_REQUEST && resultCode == Activity.RESULT_OK) {
             imageUri = data.getData();
             file = new File(String.valueOf(imageUri));
-            uploadImage();
+            if(activity.getClass() != EditProfile.class) {
+                uploadImage();
+            }
         }
 
-        dialog.dismiss();
+        if(dialog != null) {
+            dialog.dismiss();
+        }
     }
 
     private static void uploadImage() {
         try {
-            Bitmap bitmap = MediaStore.Images.Media.getBitmap(activity.getContentResolver(), imageUri);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 20, baos);
-            byte[] bytes = baos.toByteArray();
+            byte[] bytes = Utilities.compressImage(activity, imageUri);
 
-            ProgressDialog pd = new ProgressDialog(activity);
+            pd = new ProgressDialog(activity);
             pd.setMessage("Uploading... Please Wait!");
             pd.setCancelable(false);
             pd.show();
 
-            FirebaseStorage storage = FirebaseStorage.getInstance();
-            SharedPreferences sp = activity.getSharedPreferences("shared_file", MODE_PRIVATE);
-            String id = sp.getString("id", "NULL");
-            String path = "imagegallery-ks/" + id + "/" + file.getName().replace('.', '_');
-            StorageReference reference = storage.getReference().child(path);
-            reference.putBytes(bytes)
-                    .addOnCompleteListener(task -> {
-                        if(task.isSuccessful()) {
-
-                            reference.getDownloadUrl()
-                                    .addOnSuccessListener(imageUri -> {
-
-//                                        final ImageView imageView = (ImageView) getLayoutInflater().inflate(R.layout.gallery_image, (ViewGroup) null);
-//                                        Picasso.get().load(imageUri).into(imageView);
-//                                        if(userGalleryRight.getChildCount() < userGalleryLeft.getChildCount()) {
-//                                            userGalleryRight.addView(imageView);
-//                                        } else {
-//                                            userGalleryLeft.addView(imageView);
-//                                        }
-
-                                        String name = sp.getString("name", "NULL");
-                                        Image image = new Image(name.concat("'s image"), Timestamp.now(), imageUri.toString());
-
-                                        FirebaseFirestore db = FirebaseFirestore.getInstance();
-                                        db.collection("users")
-                                                .document(id)
-                                                .collection("images")
-                                                .document(reference.getName())
-                                                .set(image)
-                                                .addOnFailureListener(ex -> Toast.makeText(activity, ex.getMessage(), Toast.LENGTH_SHORT).show());
-                                    })
-                                    .addOnFailureListener(ex ->
-                                            Toast.makeText(activity, ex.getMessage(), Toast.LENGTH_SHORT).show()
-                                    );
-                        } else {
-                            Toast.makeText(activity, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                        pd.dismiss();
-                    });
+            uploadImageToFirebaseStorage(bytes);
         }
-        catch (IOException e) {
-            e.printStackTrace();
+        catch (IOException ex) {
+            Utilities.toast(activity, ex.getMessage());
+        }
+    }
+
+    private static void uploadImageToFirebaseStorage(byte[] bytes) {
+
+        SharedPreferences sp = activity.getSharedPreferences("shared_file", MODE_PRIVATE);
+        String id = sp.getString("id", "NULL");
+
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference reference = storage.getReference().child("imagegallery-ks/" + id + "/" + file.getName());
+        reference.putBytes(bytes)
+            .addOnCompleteListener(task -> {
+                if(task.isSuccessful()) {
+                    reference.getDownloadUrl()
+                        .addOnSuccessListener(uri -> {
+                            String name = sp.getString("name", "NULL");
+                            url = uri.toString();
+                            Image image = new Image(name.concat("'s image"), Timestamp.now(), url);
+
+                            uploadImageUrlToFireStore(reference, image);
+                        })
+                        .addOnFailureListener(ex -> Utilities.toast(activity, ex.getMessage()));
+                }
+                else {
+                    Utilities.toast(activity, task.getException().getMessage());
+                }
+                pd.dismiss();
+            });
+    }
+
+    private static void uploadImageUrlToFireStore(StorageReference reference, Image image) {
+        SharedPreferences sp = activity.getSharedPreferences("shared_file", MODE_PRIVATE);
+        String id = sp.getString("id", "NULL");
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("users")
+            .document(id)
+            .collection("images")
+            .document(reference.getName())
+            .set(image)
+            .addOnCompleteListener(task -> {
+                if(task.isSuccessful()) {
+                    if(activity.getClass() == MyProfileActivity.class) {
+                        updateUserGallery();
+                    } else {
+                        Utilities.toast(activity, "Image uploaded...");
+                    }
+                } else {
+                    Utilities.toast(activity, task.getException().getMessage());
+                }
+            })
+            .addOnFailureListener(ex -> Utilities.toast(activity, ex.getMessage()));
+    }
+
+    private static void updateUserGallery() {
+        final ImageView imageView = (ImageView) activity.getLayoutInflater().inflate(R.layout.gallery_image, null);
+        Picasso.get().load(imageUri).into(imageView);
+
+        LinearLayout userGalleryLeft = activity.findViewById(R.id.user_gallery_left);
+        LinearLayout userGalleryRight = activity.findViewById(R.id.user_gallery_right);
+
+        activity.findViewById(R.id.tv_no_photo).setVisibility(View.GONE);
+
+        if(userGalleryRight.getChildCount() < userGalleryLeft.getChildCount()) {
+            userGalleryRight.addView(imageView, 0);
+        } else {
+            userGalleryLeft.addView(imageView, 0);
         }
     }
 }
+
+//                    activity.finish();
+//                    activity.overridePendingTransition(0, 0);
+//                    activity.startActivity(activity.getIntent());
+//                    activity.overridePendingTransition(0, 0);

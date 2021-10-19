@@ -5,6 +5,7 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -15,9 +16,13 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
+
+import java.util.List;
 
 public class HomeActivity extends AppCompatActivity {
     LinearLayout card, cardContainer;
@@ -32,7 +37,6 @@ public class HomeActivity extends AppCompatActivity {
 
         new NavMenu(this);
 
-
         cardContainer = findViewById(R.id.card_container);
         galleryLeft = findViewById(R.id.gallery_left);
         galleryRight = findViewById(R.id.gallery_right);
@@ -46,7 +50,7 @@ public class HomeActivity extends AppCompatActivity {
         for (int i = 0; i < homeImgsIds.length; i++) {
             LinearLayout linearLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.home_card, (ViewGroup) null);
             card = linearLayout;
-            ImageView imageView = linearLayout.findViewById(R.id.img);
+            ImageView imageView = linearLayout.findViewById(R.id.iv_home_img);
             imageView.setMaxWidth(Resources.getSystem().getDisplayMetrics().widthPixels - (cardContainer.getPaddingRight() * 2));
             imageView.setImageResource(homeImgsIds[i]);
 //            final int k = i;
@@ -59,90 +63,52 @@ public class HomeActivity extends AppCompatActivity {
         galleryLeft.removeAllViews();
         galleryRight.removeAllViews();
 
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference reference = storage.getReference().child("imagegallery-ks");
-
-        reference.listAll()
-                .addOnSuccessListener(listResult -> {
-
-                    for (StorageReference prefix : listResult.getPrefixes()) {
-                        reference.child(prefix.getName()).listAll()
-                                .addOnSuccessListener(listResult1 -> {
-                                    int i = 0;
-                                    for (StorageReference item : listResult1.getItems()) {
-                                        final int k = i;
-                                        reference.child(prefix.getName()).child(item.getName()).getDownloadUrl()
-                                                .addOnSuccessListener(uri -> {
-                                                    final ImageView imageView = (ImageView) getLayoutInflater().inflate(R.layout.gallery_image, (ViewGroup) null);
-                                                    Picasso.get().load(uri).into(imageView);
-                                                    imageView.setOnClickListener(view -> viewImage(uri));
-                                                    if (k % 2 == 0) {
-                                                        galleryLeft.addView(imageView);
-                                                    } else {
-                                                        galleryRight.addView(imageView);
-                                                    }
-                                                })
-                                                .addOnFailureListener(ex -> Toast.makeText(this, ex.getMessage(), Toast.LENGTH_SHORT).show());
-                                        i++;
-                                    }
-                                })
-                                .addOnFailureListener(ex ->
-                                    Toast.makeText(this, ex.getMessage(), Toast.LENGTH_SHORT).show()
-                                );
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("users")
+            .get()
+            .addOnCompleteListener(task -> {
+                if(task.isSuccessful()) {
+                    List<User> users = task.getResult().toObjects(User.class);
+                    for (final User user : users) {
+                        displayImage(user);
                     }
-
-                    int i = galleryLeft.getChildCount() + galleryRight.getChildCount();
-                    for (StorageReference item : listResult.getItems()) {
-                        final int k = i;
-                        reference.child(item.getName()).getDownloadUrl()
-                                .addOnSuccessListener(uri -> {
-                                    final ImageView imageView = (ImageView) getLayoutInflater().inflate(R.layout.gallery_image, (ViewGroup) null);
-                                    Picasso.get().load(uri).into(imageView);
-                                    imageView.setOnClickListener(view -> viewImage(uri));
-                                    if (k % 2 == 0) {
-                                        galleryLeft.addView(imageView);
-                                    } else {
-                                        galleryRight.addView(imageView);
-                                    }
-                                })
-                                .addOnFailureListener(ex -> Toast.makeText(this, ex.getMessage(), Toast.LENGTH_SHORT).show());
-                        i++;
-                    }
-                })
-                .addOnFailureListener(ex -> Toast.makeText(this, ex.getMessage(), Toast.LENGTH_SHORT).show());
-//        reference.listAll()
-//                .addOnSuccessListener(listResult -> {
-//                    int i = 0;
-//                    for (StorageReference item : listResult.getItems()) {
-//                        final long ONE_MEGABYTE = 1024 * 1024;
-//                        final int k = i;
-//                        item.getBytes(ONE_MEGABYTE)
-//                                .addOnSuccessListener(bytes -> {
-//                                    final ImageView imageView = (ImageView) getLayoutInflater().inflate(R.layout.gallery_image, (ViewGroup) null);
-//                                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-//                                    imageView.setImageBitmap(bitmap);
-//                                    imageView.setOnClickListener(view -> viewImage(bytes));
-//
-//                                    if (k % 2 == 0) {
-//                                        galleryLeft.addView(imageView);
-//                                    } else {
-//                                        galleryRight.addView(imageView);
-//                                    }
-//                                })
-//                                .addOnFailureListener(ex ->
-//                                        Log.d("ERROR -> ", ex.getMessage())
-//                                );
-//                        i++;
-//                    }
-//                })
-//                .addOnFailureListener(ex -> {
-//                    Toast.makeText(this, ex.getMessage(), Toast.LENGTH_SHORT).show();
-//                });
+                } else {
+                    Utilities.toast(this, task.getException().getMessage());
+                }
+            })
+            .addOnFailureListener(ex -> Utilities.toast(this, ex.getMessage()));
     }
 
-    private void viewImage(Uri uri) {
+    private void displayImage(User user) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("users")
+            .document(user.getEmail().replace('.', '_'))
+            .collection("images")
+            .get()
+            .addOnCompleteListener(task1 -> {
+                List<Image> images = task1.getResult().toObjects(Image.class);
+                int i = galleryLeft.getChildCount() + galleryRight.getChildCount();
+                for (final Image image : images) {
+                    final ImageView imageView = (ImageView) getLayoutInflater().inflate(R.layout.gallery_image, null);
+                    imageView.setOnClickListener(view -> viewImage(image, user));
+                    Picasso.get().load(image.getUrl()).into(imageView);
+                    if (i++ % 2 == 0) {
+                        galleryLeft.addView(imageView);
+                    } else {
+                        galleryRight.addView(imageView);
+                    }
+                }
+            })
+            .addOnFailureListener(ex -> Utilities.toast(this, ex.getMessage()));
+    }
+
+    private void viewImage(Image image, User user) {
         Intent intent = new Intent(this, ViewImageActivity.class);
-        intent.putExtra("url", uri.toString());
+        intent.putExtra("profile_url", user.getProfile_url());
+        intent.putExtra("name", user.getName());
+        intent.putExtra("city", user.getCity());
+        intent.putExtra("email", user.getEmail());
+        intent.putExtra("image_url", image.getUrl());
         startActivity(intent);
     }
 
@@ -163,14 +129,13 @@ public class HomeActivity extends AppCompatActivity {
     // Override function for exiting application when double back clicked
     @Override
     public void onBackPressed() {
-
         if (doubleBackToExitPressedOnce) {
             super.onBackPressed();
             ActivityCompat.finishAffinity(this);
             return;
         }
-        this.doubleBackToExitPressedOnce = true;
-        Toast.makeText(this, "Press BACK again to exit", Toast.LENGTH_SHORT).show();
+        doubleBackToExitPressedOnce = true;
+        Utilities.toast(this, "Press BACK again to exit");
 
         new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
     }

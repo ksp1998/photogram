@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ImageView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:paddingTop="4dp"
-    android:paddingBottom="4dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:src="@drawable/gallery_img2"
+    android:paddingVertical="4dp"
+    android:src="@drawable/gallery_img4"
     android:scaleType="fitXY"
     android:adjustViewBounds="true"
     android:contentDescription="@string/todo"/>

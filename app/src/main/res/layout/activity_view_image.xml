@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ViewImageActivity">
 
     <ImageView
-        android:id="@+id/img"
+        android:id="@+id/image_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@drawable/home_img1"
@@ -20,19 +20,28 @@
         android:layout_height="300dp" />
 
     <RelativeLayout
+        android:id="@+id/profile_card"
         android:padding="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp">
 
-        <ImageView
-            android:id="@+id/profile"
-            android:background="@drawable/circle"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/profile_view"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:src="@drawable/profile2"
-            android:scaleType="centerCrop"
-            android:contentDescription="@string/todo" />
+            app:cardCornerRadius="24dp">
+
+            <ImageView
+                android:id="@+id/iv_profile"
+                android:background="@drawable/circle"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/default_profile"
+                android:contentDescription="@string/todo" />
+
+        </androidx.cardview.widget.CardView>
 
         <LinearLayout android:orientation="vertical"
             android:layout_width="wrap_content"
@@ -41,9 +50,10 @@
             :layout_marginRight="5dp"
             android:layout_centerInParent="true"
             android:layout_toStartOf="@+id/close"
-            android:layout_toEndOf="@+id/profile">
+            android:layout_toEndOf="@+id/profile_view">
 
             <TextView
+                android:id="@+id/tv_name"
                 android:textSize="13sp"
                 android:textStyle="bold"
                 android:textColor="@color/white"
@@ -53,6 +63,7 @@
                 android:fontFamily="@font/roboto_bold" />
 
             <TextView
+                android:id="@+id/tv_user_id"
                 android:textSize="11sp"
                 android:textStyle="normal"
                 android:textColor="#ccffffff"

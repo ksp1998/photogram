@@ -35,7 +35,7 @@ public class RegisterActivity extends AppCompatActivity {
         linkLogin = findViewById(R.id.link_login);
         progressBar = findViewById(R.id.progress_bar);
 
-        btnBack.setOnClickListener(view -> goBack());
+        btnBack.setOnClickListener(view -> onBackPressed());
 
         btnSignUp.setOnClickListener(view -> {
 
@@ -45,7 +45,7 @@ public class RegisterActivity extends AppCompatActivity {
             String password = etPassword.getText().toString().trim();
 
             if(validateData(name, email, city, password)) {
-                User user = new User(name, email, city, password);
+                User user = new User(name, city, email, password);
                 newRegistration(user);
             }
         });
@@ -55,14 +55,9 @@ public class RegisterActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
     }
 
-    private void goBack() {
-        startActivity(new Intent(this, MainActivity.class));
-    }
-
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        goBack();
+        startActivity(new Intent(this, MainActivity.class));
     }
 
     private boolean validateData(String name, String email, String city, String password) {
