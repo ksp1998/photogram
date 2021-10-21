@@ -2,34 +2,28 @@ package com.mca.imagegallery;
 
 import android.content.Intent;
 import android.content.res.Resources;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
 public class HomeActivity extends AppCompatActivity {
-    LinearLayout card, cardContainer;
-    LinearLayout galleryLeft, galleryRight;
+    private LinearLayout card, cardContainer;
+    private LinearLayout galleryLeft, galleryRight;
     int[] homeImgsIds = {R.drawable.home_img1, R.drawable.home_img2, R.drawable.home_img3, R.drawable.home_img4};
 
-    private boolean doubleBackToExitPressedOnce = false;
+    private FirebaseFirestore db;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,11 +35,13 @@ public class HomeActivity extends AppCompatActivity {
         galleryLeft = findViewById(R.id.gallery_left);
         galleryRight = findViewById(R.id.gallery_right);
 
-        setHomeImages();
-        browseImages();
+        db = FirebaseFirestore.getInstance();
+
+        setRecentImages();
+        browseAllImages();
     }
 
-    private void setHomeImages() {
+    private void setRecentImages() {
         cardContainer.removeAllViews();
         for (int i = 0; i < homeImgsIds.length; i++) {
             LinearLayout linearLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.home_card, (ViewGroup) null);
@@ -59,47 +55,44 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-    private void browseImages() {
+    private void browseAllImages() {
         galleryLeft.removeAllViews();
         galleryRight.removeAllViews();
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("users")
             .get()
             .addOnCompleteListener(task -> {
                 if(task.isSuccessful()) {
                     List<User> users = task.getResult().toObjects(User.class);
-                    for (final User user : users) {
+                    for (User user : users) {
                         displayImage(user);
                     }
                 } else {
-                    Utilities.toast(this, task.getException().getMessage());
+                    Utils.toast(this, task.getException().getMessage());
                 }
             })
-            .addOnFailureListener(ex -> Utilities.toast(this, ex.getMessage()));
+            .addOnFailureListener(ex -> Utils.toast(this, ex.getMessage()));
     }
 
     private void displayImage(User user) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("users")
-            .document(user.getEmail().replace('.', '_'))
+            .document(Utils.getID(user.getEmail()))
             .collection("images")
             .get()
-            .addOnCompleteListener(task1 -> {
-                List<Image> images = task1.getResult().toObjects(Image.class);
+            .addOnCompleteListener(task -> {
+                List<Image> images = task.getResult().toObjects(Image.class);
                 int i = galleryLeft.getChildCount() + galleryRight.getChildCount();
-                for (final Image image : images) {
-                    final ImageView imageView = (ImageView) getLayoutInflater().inflate(R.layout.gallery_image, null);
+                for (Image image : images) {
+                    ImageView imageView = (ImageView) getLayoutInflater().inflate(R.layout.gallery_image, null);
                     imageView.setOnClickListener(view -> viewImage(image, user));
                     Picasso.get().load(image.getUrl()).into(imageView);
-                    if (i++ % 2 == 0) {
-                        galleryLeft.addView(imageView);
-                    } else {
-                        galleryRight.addView(imageView);
-                    }
+
+                    if (i % 2 == 0) galleryLeft.addView(imageView);
+                    else galleryRight.addView(imageView);
+                    i++;
                 }
             })
-            .addOnFailureListener(ex -> Utilities.toast(this, ex.getMessage()));
+            .addOnFailureListener(ex -> Utils.toast(this, ex.getMessage()));
     }
 
     private void viewImage(Image image, User user) {
@@ -112,14 +105,12 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    // override method to perform action on permission grant and revoke
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         Permissions.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    // override method which will be called on when image is captured or selected
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -127,6 +118,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     // Override function for exiting application when double back clicked
+    private boolean doubleBackToExitPressedOnce = false;
     @Override
     public void onBackPressed() {
         if (doubleBackToExitPressedOnce) {
@@ -135,7 +127,7 @@ public class HomeActivity extends AppCompatActivity {
             return;
         }
         doubleBackToExitPressedOnce = true;
-        Utilities.toast(this, "Press BACK again to exit");
+        Utils.toast(this, "Press BACK again to exit");
 
         new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
     }

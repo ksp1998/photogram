@@ -1,36 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
-    android:paddingTop="24dp"
+    android:paddingTop="16dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <TextView
+        android:id="@+id/message"
         android:textSize="13sp"
         android:textColor="@color/black"
         android:gravity="top"
-        android:id="@+id/message"
         android:background="@drawable/message_sent_border"
         android:padding="16dp"
         android:layout_width="70dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginHorizontal="16dp"
         android:text="@string/message_example_text_2"
         android:lineSpacingExtra="3sp"
         android:translationY="-1.38sp"
         android:fontFamily="@font/roboto"
-        android:layout_toStartOf="@+id/profile"
+        android:layout_toStartOf="@+id/card_profile"
         android:layout_alignParentStart="true" />
 
-    <ImageView
-        android:id="@+id/profile"
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_profile"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:src="@drawable/profile"
-        android:contentDescription="@string/todo"
         android:layout_marginEnd="16dp"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        app:cardCornerRadius="24dp">
+
+        <ImageView
+            android:id="@+id/iv_profile"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/profile"
+            android:scaleType="centerCrop"
+            android:contentDescription="@string/todo" />
+
+    </androidx.cardview.widget.CardView>
 
 </RelativeLayout>

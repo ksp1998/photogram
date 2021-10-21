@@ -7,17 +7,14 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -27,11 +24,12 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import okhttp3.internal.Util;
 
 public class NavMenu {
 
@@ -44,6 +42,12 @@ public class NavMenu {
 
     public static final int CAMERA_REQUEST = 100;
     public static final int GALLERY_REQUEST = 101;
+
+    private static SharedPreferences sp;
+    private static String id;
+    private static FirebaseFirestore db;
+    private static FirebaseStorage storage;
+    private static StorageReference reference;
 
     public NavMenu(Activity activity) {
 
@@ -74,9 +78,15 @@ public class NavMenu {
         }
 
         btnAdd.setOnClickListener(view -> {
-            dialog = Utilities.pickDialog(activity);
+            dialog = Utils.pickDialog(activity);
             dialog.show();
         });
+
+        sp = activity.getSharedPreferences(Utils.LOGIN_SHARED_FILE, MODE_PRIVATE);
+        id = Utils.getID(sp.getString("email", null));
+
+        db = FirebaseFirestore.getInstance();
+        storage = FirebaseStorage.getInstance();
     }
 
     public static void openCamera(Activity activity) {
@@ -133,52 +143,47 @@ public class NavMenu {
 
     private static void uploadImage() {
         try {
-            byte[] bytes = Utilities.compressImage(activity, imageUri);
+            byte[] bytes = Utils.compressImage(activity, imageUri);
 
-            pd = new ProgressDialog(activity);
-            pd.setMessage("Uploading... Please Wait!");
-            pd.setCancelable(false);
+            pd = Utils.progressDialog(activity, "Uploading... Please Wait!");
             pd.show();
 
             uploadImageToFirebaseStorage(bytes);
         }
         catch (IOException ex) {
-            Utilities.toast(activity, ex.getMessage());
+            Utils.toast(activity, ex.getMessage());
         }
     }
 
     private static void uploadImageToFirebaseStorage(byte[] bytes) {
 
-        SharedPreferences sp = activity.getSharedPreferences("shared_file", MODE_PRIVATE);
-        String id = sp.getString("id", "NULL");
-
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference reference = storage.getReference().child("imagegallery-ks/" + id + "/" + file.getName());
+        reference = storage.getReference().child("imagegallery-ks/" + id + "/" + file.getName());
         reference.putBytes(bytes)
             .addOnCompleteListener(task -> {
                 if(task.isSuccessful()) {
                     reference.getDownloadUrl()
                         .addOnSuccessListener(uri -> {
-                            String name = sp.getString("name", "NULL");
+                            String name = sp.getString("name", null);
                             url = uri.toString();
                             Image image = new Image(name.concat("'s image"), Timestamp.now(), url);
 
-                            uploadImageUrlToFireStore(reference, image);
+                            uploadImageUrlToFirestore(image);
                         })
-                        .addOnFailureListener(ex -> Utilities.toast(activity, ex.getMessage()));
+                        .addOnFailureListener(ex -> Utils.toast(activity, ex.getMessage()));
                 }
                 else {
-                    Utilities.toast(activity, task.getException().getMessage());
+                    Utils.toast(activity, task.getException().getMessage());
                 }
+                pd.dismiss();
+            })
+            .addOnFailureListener(ex -> {
+                Utils.toast(activity, ex.getMessage());
                 pd.dismiss();
             });
     }
 
-    private static void uploadImageUrlToFireStore(StorageReference reference, Image image) {
-        SharedPreferences sp = activity.getSharedPreferences("shared_file", MODE_PRIVATE);
-        String id = sp.getString("id", "NULL");
+    private static void uploadImageUrlToFirestore(Image image) {
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("users")
             .document(id)
             .collection("images")
@@ -187,19 +192,20 @@ public class NavMenu {
             .addOnCompleteListener(task -> {
                 if(task.isSuccessful()) {
                     if(activity.getClass() == MyProfileActivity.class) {
-                        updateUserGallery();
+                        activity.recreate();
                     } else {
-                        Utilities.toast(activity, "Image uploaded...");
+                        activity.startActivity(new Intent(activity, MyProfileActivity.class));
                     }
+                    Utils.toast(activity, "Image uploaded...");
                 } else {
-                    Utilities.toast(activity, task.getException().getMessage());
+                    Utils.toast(activity, task.getException().getMessage());
                 }
             })
-            .addOnFailureListener(ex -> Utilities.toast(activity, ex.getMessage()));
+            .addOnFailureListener(ex -> Utils.toast(activity, ex.getMessage()));
     }
 
     private static void updateUserGallery() {
-        final ImageView imageView = (ImageView) activity.getLayoutInflater().inflate(R.layout.gallery_image, null);
+        ImageView imageView = (ImageView) activity.getLayoutInflater().inflate(R.layout.gallery_image, null);
         Picasso.get().load(imageUri).into(imageView);
 
         LinearLayout userGalleryLeft = activity.findViewById(R.id.user_gallery_left);
@@ -214,8 +220,3 @@ public class NavMenu {
         }
     }
 }
-
-//                    activity.finish();
-//                    activity.overridePendingTransition(0, 0);
-//                    activity.startActivity(activity.getIntent());
-//                    activity.overridePendingTransition(0, 0);

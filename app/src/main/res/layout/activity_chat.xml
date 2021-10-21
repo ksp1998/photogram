@@ -28,12 +28,11 @@
     </RelativeLayout>
 
     <ScrollView
+        android:id="@+id/scroller"
         android:scrollbarSize="0dp"
         android:visibility="visible"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="-6dp"
-        android:layout_marginBottom="6dp"
         android:layout_above="@+id/chat_bar"
         android:layout_below="@+id/bar">
 
@@ -43,8 +42,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <include layout="@layout/message_sent"/>
-            <include layout="@layout/message_received"/>
+<!--            <include layout="@layout/message_sent"/>-->
+<!--            <include layout="@layout/message_received"/>-->
 
         </LinearLayout>
 

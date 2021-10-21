@@ -1,5 +1,6 @@
 package com.mca.imagegallery;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
@@ -8,7 +9,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -18,7 +18,7 @@ public class RegisterActivity extends AppCompatActivity {
     private Button btnBack;
     private Button btnSignUp;
     private TextView linkLogin;
-    private ProgressBar progressBar;
+    private ProgressDialog pd;
 
     private FirebaseFirestore db;
 
@@ -33,7 +33,6 @@ public class RegisterActivity extends AppCompatActivity {
         btnBack = findViewById(R.id.btn_back);
         btnSignUp = findViewById(R.id.btn_signup);
         linkLogin = findViewById(R.id.link_login);
-        progressBar = findViewById(R.id.progress_bar);
 
         btnBack.setOnClickListener(view -> onBackPressed());
 
@@ -102,42 +101,43 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void newRegistration(User user) {
 
-        progressBar.setVisibility(View.VISIBLE);
-        String id = user.getEmail().replace('.', '_');
+        pd = Utils.progressDialog(this, "Please wait...");
+        pd.show();
+        String id = Utils.getID(user.getEmail());
 
         db.collection("users")
-                .document(id)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if(task.isSuccessful()) {
-                        if(!task.getResult().exists()) {
-                            registerUser(id, user);
-                        } else {
-                            etEmail.setError("Email already registered!");
-                            etEmail.requestFocus();
-                        }
+            .document(id)
+            .get()
+            .addOnCompleteListener(task -> {
+                if(task.isSuccessful()) {
+                    if(!task.getResult().exists()) {
+                        registerUser(user);
                     } else {
-                        Toast.makeText(this,
-                                task.getException().getMessage(),
-                                Toast.LENGTH_SHORT).show();
+                        etEmail.setError("Email already registered!");
+                        etEmail.requestFocus();
                     }
-                    progressBar.setVisibility(View.GONE);
-                });
+                } else {
+                    Utils.toast(this, task.getException().getMessage());
+                }
+                pd.dismiss();
+            });
     }
 
-    private void registerUser(String id, User user) {
+    private void registerUser(User user) {
 
         db.collection("users")
-                .document(id)
-                .set(user)
-                .addOnCompleteListener(task -> {
-                    if(task.isSuccessful()) {
-                        Toast.makeText(this, "User has been registered successfully...", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(this, LoginActivity.class));
-                    } else {
-                        Toast.makeText(this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                    progressBar.setVisibility(View.GONE);
-                });
+            .document(Utils.getID(user.getEmail()))
+            .set(user)
+            .addOnCompleteListener(task -> {
+                if(task.isSuccessful()) {
+                    Utils.toast(this, "User has been registered successfully...");
+                    Intent intent = new Intent(this, LoginActivity.class);
+                    intent.putExtra("email", user.getEmail());
+                    startActivity(intent);
+                } else {
+                    Utils.toast(this, task.getException().getMessage());
+                }
+                pd.dismiss();
+            });
     }
 }

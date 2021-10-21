@@ -10,7 +10,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,7 +26,7 @@ public class MyProfileActivity extends AppCompatActivity {
     private Button btnBack, btnLogout, btnMessage, btnEdit;
     private LinearLayout userGalleryLeft;
     private LinearLayout userGalleryRight;
-    private String id, name, city, profile_url;
+    private String email, name, city, profile_url;
     private boolean otherUserProfile = false;
 
     public void onCreate(Bundle savedInstanceState) {
@@ -47,22 +46,22 @@ public class MyProfileActivity extends AppCompatActivity {
         userGalleryLeft = findViewById(R.id.user_gallery_left);
         userGalleryRight = findViewById(R.id.user_gallery_right);
 
-        SharedPreferences sp = getSharedPreferences("shared_file", MODE_PRIVATE);
-        id = sp.getString("id", "NULL");
+        SharedPreferences sp = getSharedPreferences(Utils.LOGIN_SHARED_FILE, MODE_PRIVATE);
+        email = sp.getString("email", null);
 
         String temp = null;
         if(getIntent().getStringExtra("email") != null) {
-            temp = getIntent().getStringExtra("email").replace('.', '_');
+            temp = getIntent().getStringExtra("email");
         }
 
-        if(temp != null && !temp.equals(id)) {
-            id = temp;
+        if(temp != null && !temp.equals(email)) {
+            email = temp;
             otherUserData();
         }
         else {
-            name = sp.getString("name", "NULL");
-            city = sp.getString("city", "NULL");
-            profile_url = sp.getString("profile_url", "NULL");
+            name = sp.getString("name", null);
+            city = sp.getString("city", null);
+            profile_url = sp.getString("profile_url", null);
 
             btnLogout.setOnClickListener(view -> confirmDialog());
             btnEdit.setOnClickListener(view -> startActivity(new Intent(this, EditProfile.class)));
@@ -90,7 +89,8 @@ public class MyProfileActivity extends AppCompatActivity {
         btnMessage.setOnClickListener(view -> {
             Intent intent = new Intent(this, ChatActivity.class);
             intent.putExtra("name", name);
-            intent.putExtra("id", id);
+            intent.putExtra("email", email);
+            intent.putExtra("profile_url", profile_url);
             startActivity(intent);
         });
     }
@@ -106,7 +106,7 @@ public class MyProfileActivity extends AppCompatActivity {
     }
 
     private void logout() {
-        SharedPreferences sp = getSharedPreferences("shared_file", Context.MODE_PRIVATE);
+        SharedPreferences sp = getSharedPreferences(Utils.LOGIN_SHARED_FILE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
         editor.clear();
         editor.apply();
@@ -119,30 +119,30 @@ public class MyProfileActivity extends AppCompatActivity {
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("users")
-            .document(id)
+            .document(Utils.getID(email))
             .collection("images")
             .get()
             .addOnCompleteListener(task -> {
                 if(task.isSuccessful()) {
-                    if(task.getResult().getDocuments().size() > 0) {
+
+                    List<Image> images = task.getResult().toObjects(Image.class);
+                    if(images.size() > 0) {
                         tvNoPhoto.setVisibility(View.GONE);
                     }
 
-                    List<Image> images = task.getResult().toObjects(Image.class);
                     int i = userGalleryLeft.getChildCount() + userGalleryRight.getChildCount();
                     for (Image image : images) {
                         final ImageView imageView = (ImageView) getLayoutInflater().inflate(R.layout.gallery_image, null);
                         imageView.setOnClickListener(view -> viewImage(image));
                         Picasso.get().load(image.getUrl()).into(imageView);
-                        if (i % 2 == 0) {
-                            userGalleryLeft.addView(imageView);
-                        } else {
-                            userGalleryRight.addView(imageView);
-                        }
+
+                        if (i % 2 == 0) userGalleryLeft.addView(imageView);
+                        else userGalleryRight.addView(imageView);
                         i++;
                     }
-                } else {
-                     Toast.makeText(this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Utils.toast(this, task.getException().getMessage());
                 }
             });
     }
@@ -152,19 +152,17 @@ public class MyProfileActivity extends AppCompatActivity {
         intent.putExtra("activity", "MyProfile");
         intent.putExtra("profile_url", profile_url);
         intent.putExtra("name", name);
-        intent.putExtra("email", id.replaceAll("_", "."));
+        intent.putExtra("email", email);
         intent.putExtra("image_url", image.getUrl());
         startActivity(intent);
     }
 
-    // override method to perform action on permission grant and revoke
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         Permissions.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    // override method which will be called on when image is captured or selected
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -175,10 +173,10 @@ public class MyProfileActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if(otherUserProfile) return;
-        SharedPreferences sp = getSharedPreferences("shared_file", MODE_PRIVATE);
-        name = sp.getString("name", "NULL");
-        city = sp.getString("city", "NULL");
-        profile_url = sp.getString("profile_url", "NULL");
+        SharedPreferences sp = getSharedPreferences(Utils.LOGIN_SHARED_FILE, MODE_PRIVATE);
+        name = sp.getString("name", null);
+        city = sp.getString("city", null);
+        profile_url = sp.getString("profile_url", null);
 
         Picasso.get().load(profile_url).into(ivProfile);
         tvName.setText(name);

@@ -4,18 +4,15 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
-import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 public class MainActivity extends AppCompatActivity {
@@ -38,19 +35,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void isUserLoggedIn() {
-        SharedPreferences sp = getSharedPreferences("shared_file", MODE_PRIVATE);
-        if(sp.getString("id", null) != null) {
-            Toast.makeText(this, "Logged In", Toast.LENGTH_SHORT).show();
+        SharedPreferences sp = getSharedPreferences(Utils.LOGIN_SHARED_FILE, MODE_PRIVATE);
+        if(sp.getString("email", null) != null) {
             startActivity(new Intent(this, HomeActivity.class));
         }
     }
 
     private void addRecentUser() {
-        SharedPreferences sp = getSharedPreferences("recent_user", MODE_PRIVATE);
+        SharedPreferences sp = getSharedPreferences(Utils.RECENT_USER_SHARED_FILE, MODE_PRIVATE);
         if(sp.getString("email", null) != null) {
 
             LinearLayout userCard = (LinearLayout) getLayoutInflater().inflate(R.layout.user_card, null);
-            userCard.setOnClickListener(view -> startActivity(new Intent(this, LoginActivity.class)));
+            userCard.setOnClickListener(view -> {
+                Intent intent = new Intent(this, LoginActivity.class);
+                intent.putExtra("email", sp.getString("email", null));
+                startActivity(intent);
+            });
 
             ImageView ivProfile = userCard.findViewById(R.id.iv_profile);
             TextView tvName = userCard.findViewById(R.id.tv_name);
@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         this.doubleBackToExitPressedOnce = true;
-        Toast.makeText(this, "Press BACK again to exit", Toast.LENGTH_SHORT).show();
+        Utils.toast(this, "Press BACK again to exit");
 
         new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
     }

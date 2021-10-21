@@ -14,7 +14,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -52,16 +51,16 @@ public class EditProfile extends AppCompatActivity {
 
         btnBack.setOnClickListener(view -> onBackPressed());
 
-        SharedPreferences sp = getSharedPreferences("shared_file", MODE_PRIVATE);
-        id = sp.getString("id", "NULL");
-        name = sp.getString("name", "NULL");
-        city = sp.getString("city", "NULL");
-        profile_url = sp.getString("profile_url", "NULL");
+        SharedPreferences sp = getSharedPreferences(Utils.LOGIN_SHARED_FILE, MODE_PRIVATE);
+        id = Utils.getID(sp.getString("email", null));
+        name = sp.getString("name", null);
+        city = sp.getString("city", null);
+        profile_url = sp.getString("profile_url", null);
         etName.setText(name);
         etCity.setText(city);
         Picasso.get().load(profile_url).into(ivProfile);
 
-        dialog = Utilities.pickDialog(this);
+        dialog = Utils.pickDialog(this);
         ivProfile.setOnClickListener(view -> dialog.show());
         tvChangeProfilePhoto.setOnClickListener(view -> dialog.show());
 
@@ -91,7 +90,7 @@ public class EditProfile extends AppCompatActivity {
 
         if(validateData(updatedName, updatedCity) && (!updatedName.equals(name) || !updatedCity.equals(city) || updatedProfile != null)) {
 
-            pd = Utilities.progressDialog(this, "Updating...");
+            pd = Utils.progressDialog(this, "Updating...");
             pd.show();
 
             FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -110,7 +109,7 @@ public class EditProfile extends AppCompatActivity {
                 })
             .addOnFailureListener(ex -> {
                 pd.dismiss();
-                Utilities.toast(this, ex.getMessage());
+                Utils.toast(this, ex.getMessage());
             });
         }
     }
@@ -118,7 +117,7 @@ public class EditProfile extends AppCompatActivity {
     private void uploadProfileToFirebaseStorage(User user) {
         try {
 
-            byte[] bytes = Utilities.compressImage(this, imageUri);
+            byte[] bytes = Utils.compressImage(this, imageUri);
 
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference reference = storage.getReference().child("imagegallery-ks/" + id + "_profile");
@@ -129,16 +128,16 @@ public class EditProfile extends AppCompatActivity {
                             user.setProfile_url(uri.toString());
                             updateUserDataToFirestore(user);
                         })
-                        .addOnFailureListener(ex -> Utilities.toast(this, ex.getMessage()));
+                        .addOnFailureListener(ex -> Utils.toast(this, ex.getMessage()));
                 })
                 .addOnFailureListener(ex -> {
                     pd.dismiss();
-                    Utilities.toast(this, ex.getMessage());
+                    Utils.toast(this, ex.getMessage());
                 });
         }
         catch (IOException ex) {
             pd.dismiss();
-            Utilities.toast(this, ex.getMessage());
+            Utils.toast(this, ex.getMessage());
         }
     }
 
@@ -148,24 +147,24 @@ public class EditProfile extends AppCompatActivity {
             .document(id)
             .set(user)
             .addOnSuccessListener(unused -> {
-                Utilities.toast(this, "Profile Updated...");
+                Utils.toast(this, "Profile Updated...");
                 updateSharedPreferences(user);
                 finish();
             })
             .addOnFailureListener(ex -> {
                 pd.dismiss();
-                Utilities.toast(this, ex.getMessage());
+                Utils.toast(this, ex.getMessage());
             });
     }
 
     private void updateSharedPreferences(User user) {
-        SharedPreferences.Editor editor = getSharedPreferences("shared_file", MODE_PRIVATE).edit();
+        SharedPreferences.Editor editor = getSharedPreferences(Utils.LOGIN_SHARED_FILE, MODE_PRIVATE).edit();
         editor.putString("name", user.getName());
         editor.putString("city", user.getCity());
         editor.putString("profile_url", user.getProfile_url());
         editor.apply();
 
-        editor = getSharedPreferences("recent_user", MODE_PRIVATE).edit();
+        editor = getSharedPreferences(Utils.RECENT_USER_SHARED_FILE, MODE_PRIVATE).edit();
         editor.putString("name", user.getName());
         editor.putString("profile_url", user.getProfile_url());
         editor.apply();

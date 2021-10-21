@@ -3,13 +3,10 @@ package com.mca.imagegallery;
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
-import java.io.File;
 
 public class Permissions {
 
@@ -47,9 +44,9 @@ public class Permissions {
 
     public static void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if(requestCode == PERMISSION_CODE && grantResults[0] == GRANTED && grantResults[1] == GRANTED && grantResults[2] == GRANTED) {
-            Toast.makeText(activity, "PERMISSIONS GRANTED...", Toast.LENGTH_SHORT).show();
+            Utils.toast(activity, "PERMISSIONS GRANTED...");
         } else {
-            Toast.makeText(activity, "PERMISSIONS DENIED!", Toast.LENGTH_SHORT).show();
+            Utils.toast(activity, "PERMISSIONS DENIED!");
         }
     }
 }
