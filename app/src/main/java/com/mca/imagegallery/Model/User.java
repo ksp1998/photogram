@@ -1,4 +1,4 @@
-package com.mca.imagegallery;
+package com.mca.imagegallery.Model;
 
 public class User {
 

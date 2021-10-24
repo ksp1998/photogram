@@ -5,45 +5,58 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".SearchActivity">
 
+    <LinearLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/title"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginVertical="24dp"
+            android:text="@string/search" />
+
+        <EditText
+            android:id="@+id/et_search"
+            style="@style/input_text"
+            android:hint="@string/search_users"
+            android:inputType="text" />
+
+        <TextView
+            style="@style/sub_title"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginVertical="16dp"
+            android:text="@string/all_results" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_no_result"
+        style="@style/sub_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="32dp"
+        android:textSize="16sp"
+        android:layout_below="@+id/container"
+        android:layout_centerHorizontal="true"
+        android:text="@string/no_users_found" />
+
     <ScrollView
-        android:scrollbarSize="0dp"
-        android:visibility="visible"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/menu">
+        android:layout_marginHorizontal="24dp"
+        android:layout_below="@+id/container"
+        android:layout_above="@+id/menu"
+        android:scrollbarSize="0dp"
+        android:visibility="visible">
 
         <LinearLayout
-            android:orientation="vertical"
+            android:id="@+id/user_list"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:layout_marginLeft="16dp"
-                android:layout_marginTop="24dp"
-                android:layout_marginRight="16dp"
-                android:layout_marginBottom="24dp"
-                android:text="@string/search"
-                style="@style/title" />
-
-            <EditText
-                android:hint="Search all photos"
-                android:inputType="text"
-                style="@style/input_text" />
-
-            <TextView
-                android:layout_marginLeft="24dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginRight="24dp"
-                android:layout_marginBottom="16dp"
-                android:text="@string/all_results"
-                style="@style/sub_title" />
-
-<!--            <Button-->
-<!--                android:id="@+id/btn_see_more"-->
-<!--                android:layout_marginHorizontal="24dp"-->
-<!--                android:layout_marginVertical="32dp"-->
-<!--                android:text="@string/see_more"-->
-<!--                style="@style/button_light" />-->
+            android:layout_height="wrap_content"
+            android:background="@drawable/border_bottom"
+            android:orientation="vertical">
 
         </LinearLayout>
 

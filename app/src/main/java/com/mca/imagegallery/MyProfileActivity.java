@@ -5,6 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -16,6 +19,12 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.storage.FirebaseStorage;
+import com.mca.imagegallery.Model.Image;
+import com.mca.imagegallery.helper.NavMenu;
+import com.mca.imagegallery.helper.Permissions;
+import com.mca.imagegallery.helper.Utils;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -28,6 +37,9 @@ public class MyProfileActivity extends AppCompatActivity {
     private LinearLayout userGalleryRight;
     private String email, name, city, profile_url;
     private boolean otherUserProfile = false;
+
+    private FirebaseFirestore db;
+    private FirebaseStorage storage;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +83,9 @@ public class MyProfileActivity extends AppCompatActivity {
         tvName.setText(name);
         tvCity.setText(city);
 
+        db = FirebaseFirestore.getInstance();
+        storage = FirebaseStorage.getInstance();
+
         setUserGalleryImages();
     }
 
@@ -99,7 +114,7 @@ public class MyProfileActivity extends AppCompatActivity {
         new AlertDialog.Builder(this)
             .setTitle("Logout")
             .setMessage("Are you sure?")
-            .setIcon(R.drawable.ic_launcher_background)
+            .setIcon(R.drawable.logo)
             .setPositiveButton("YES", (dialog, which) -> logout())
             .setNegativeButton("NO", null)
             .show();
@@ -113,27 +128,27 @@ public class MyProfileActivity extends AppCompatActivity {
         startActivity(new Intent(this, MainActivity.class));
     }
 
-    private void setUserGalleryImages() {
+    public void setUserGalleryImages() {
         userGalleryLeft.removeAllViews();
         userGalleryRight.removeAllViews();
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("users")
             .document(Utils.getID(email))
             .collection("images")
+            .orderBy("id", Query.Direction.DESCENDING)
             .get()
             .addOnCompleteListener(task -> {
                 if(task.isSuccessful()) {
 
                     List<Image> images = task.getResult().toObjects(Image.class);
-                    if(images.size() > 0) {
-                        tvNoPhoto.setVisibility(View.GONE);
-                    }
+                    if(images.size() > 0) { tvNoPhoto.setVisibility(View.GONE); }
 
                     int i = userGalleryLeft.getChildCount() + userGalleryRight.getChildCount();
                     for (Image image : images) {
-                        final ImageView imageView = (ImageView) getLayoutInflater().inflate(R.layout.gallery_image, null);
+                        ImageView imageView = (ImageView) getLayoutInflater().inflate(R.layout.gallery_image, null);
                         imageView.setOnClickListener(view -> viewImage(image));
+                        imageView.setTag(image);
+                        registerForContextMenu(imageView);
                         Picasso.get().load(image.getUrl()).into(imageView);
 
                         if (i % 2 == 0) userGalleryLeft.addView(imageView);
@@ -167,6 +182,69 @@ public class MyProfileActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         NavMenu.onActivityResult(requestCode, resultCode, data);
+    }
+
+    // overridden method to inflate context menu
+    ImageView imageView;
+    Image image;
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.user_image_options_menu, menu);
+
+        if(otherUserProfile) {
+            menu.findItem(R.id.delete).setVisible(false);
+        }
+
+        imageView = (ImageView) v;
+        image = (Image) imageView.getTag();
+    }
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+
+        switch(item.getItemId()) {
+            case R.id.view:
+                viewImage(image);
+                break;
+            case R.id.delete:
+                deleteUserImage();
+                break;
+            case R.id.cancel: break;
+        }
+        return super.onContextItemSelected(item);
+    }
+
+    private void deleteUserImage() {
+        db.collection("users")
+            .document(Utils.getID(email))
+            .collection("images")
+            .document(String.valueOf(image.getId()))
+            .delete()
+            .addOnCompleteListener(task -> {
+                deleteUserImageFromFireStoreImages();
+                deleteUserImageFromFirebaseStorage();
+                imageView.setVisibility(View.GONE);
+                Utils.toast(this, "Image deleted!");
+            })
+            .addOnFailureListener(ex -> Utils.toast(this, ex.getMessage()));
+    }
+
+    private void deleteUserImageFromFireStoreImages() {
+        db.collection("images")
+            .document(String.valueOf(image.getId()))
+            .delete()
+            .addOnFailureListener(ex -> Utils.toast(this, ex.getMessage()));
+    }
+
+    private void deleteUserImageFromFirebaseStorage() {
+        storage.getReference()
+            .child("imagegallery-ks")
+            .child(Utils.getID(email))
+            .child(String.valueOf(image.getId()))
+            .delete()
+            .addOnFailureListener(ex -> Utils.toast(this, ex.getMessage()));
     }
 
     @Override

@@ -1,12 +1,18 @@
 package com.mca.imagegallery;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -20,6 +26,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.mca.imagegallery.Model.Message;
+import com.mca.imagegallery.helper.Utils;
 import com.squareup.picasso.Picasso;
 
 public class ChatActivity extends AppCompatActivity {
@@ -29,7 +37,11 @@ public class ChatActivity extends AppCompatActivity {
     private LinearLayout chatContainer;
     private EditText inputMessage;
     private ScrollView scroller;
-    private String receiverId, senderId, reciverProfile, senderProfile;
+    private ProgressBar progressBar;
+    private String receiverId, senderId, receiverProfile, senderProfile;
+
+    private FirebaseDatabase database;
+    private DatabaseReference reference;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +53,7 @@ public class ChatActivity extends AppCompatActivity {
         inputMessage =  findViewById(R.id.message_box);
         chatContainer = findViewById(R.id.chat_card_container);
         scroller = findViewById(R.id.scroller);
+        progressBar = findViewById(R.id.progress_bar);
 
         tvTitle.setText(getIntent().getStringExtra("name"));
         btnBack.setOnClickListener(view -> super.onBackPressed());
@@ -48,41 +61,48 @@ public class ChatActivity extends AppCompatActivity {
 
         receiverId = Utils.getID(getIntent().getStringExtra("email"));
         senderId = Utils.getID(getSharedPreferences(Utils.LOGIN_SHARED_FILE, MODE_PRIVATE).getString("email", null));
-        reciverProfile = getIntent().getStringExtra("profile_url");
+        receiverProfile = getIntent().getStringExtra("profile_url");
         senderProfile = getSharedPreferences(Utils.LOGIN_SHARED_FILE, MODE_PRIVATE).getString("profile_url", null);
+
+        database = FirebaseDatabase.getInstance();
+
         receiveMessage();
     }
 
     private void sendMessage() {
         String text = inputMessage.getText().toString().trim();
         if(!text.equals("")) {
+            long id = System.currentTimeMillis();
 
-            FirebaseDatabase database = FirebaseDatabase.getInstance();
             String time = String.valueOf(System.currentTimeMillis());
-            Message message = new Message(text, Timestamp.now().toString(), "out");
+            Message message = new Message(id, text, Timestamp.now().toString(), "out");
 
-            DatabaseReference reference = database.getReference().child(senderId).child(receiverId).child(time);
+            reference = database.getReference().child(senderId).child(receiverId).child(time);
             reference.setValue(message)
                 .addOnCompleteListener(task -> {
-                    Utils.toast(this, "Message sent...");
+                    // Utils.toast(this, "Message sent...");
                     inputMessage.getText().clear();
+                    scroller.fullScroll(View.FOCUS_DOWN);
                 })
                 .addOnFailureListener(ex -> Utils.toast(this, ex.getMessage()));
 
-            message = new Message(text, Timestamp.now().toString(), "in");
+            message = new Message(id, text, Timestamp.now().toString(), "in");
             reference = database.getReference().child(receiverId).child(senderId).child(time);
-            reference.setValue(message);
+            reference.setValue(message)
+                .addOnFailureListener(ex -> Utils.toast(this, ex.getMessage()));
         }
     }
 
     private void receiveMessage() {
         final Activity activity = this;
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference reference = database.getReference().child(senderId).child(receiverId);
+        progressBar.setVisibility(View.VISIBLE);
+
+        reference = database.getReference().child(senderId).child(receiverId);
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 listMessages(snapshot.getChildren());
+                progressBar.setVisibility(View.GONE);
             }
 
             @Override
@@ -101,20 +121,71 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void addMessage(Message message) {
-        RelativeLayout messageCard;
+        int layout;
         String profileUrl;
         if(message.getIn_out().equals("in")) {
-            messageCard = (RelativeLayout) getLayoutInflater().inflate(R.layout.message_received, null);
-            profileUrl = reciverProfile;
+            layout = R.layout.message_received;
+            profileUrl = receiverProfile;
         } else {
-            messageCard = (RelativeLayout) getLayoutInflater().inflate(R.layout.message_sent, null);
+            layout = R.layout.message_sent;
             profileUrl = senderProfile;
         }
+        RelativeLayout messageCard = (RelativeLayout) getLayoutInflater().inflate(layout, null);
         TextView tvMessage  = messageCard.findViewById(R.id.message);
         tvMessage.setText(message.getMessage());
+        tvMessage.setTag(message);
+        registerForContextMenu(tvMessage);
         ImageView ivProfile = messageCard.findViewById(R.id.iv_profile);
         Picasso.get().load(profileUrl).into(ivProfile);
         chatContainer.addView(messageCard);
         scroller.fullScroll(View.FOCUS_DOWN);
+    }
+
+    Message message;
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.message_options_menu, menu);
+
+        message = (Message) v.getTag();
+    }
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+
+        switch(item.getItemId()) {
+            case R.id.copy:
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                ClipData data = ClipData.newPlainText("message", message.getMessage());
+                clipboard.setPrimaryClip(data);
+                Utils.toast(this, "Message copied!");
+                break;
+            case R.id.delete_for_me:
+                deleteMessageForMe();
+                break;
+            case R.id.delete_for_both:
+                deleteMessageForBoth();
+                break;
+            case R.id.cancel: break;
+        }
+        return super.onContextItemSelected(item);
+    }
+
+    private void deleteMessageForMe() {
+        database.getReference().child(senderId).child(receiverId)
+            .child(String.valueOf(message.getId()))
+            .removeValue()
+            // .addOnCompleteListener(task -> Utils.toast(this, "Message deleted!"))
+            .addOnFailureListener(ex -> Utils.toast(this, ex.getMessage()));
+    }
+
+    private void deleteMessageForBoth() {
+        deleteMessageForMe();
+        database.getReference().child(receiverId).child(senderId)
+            .child(String.valueOf(message.getId()))
+            .removeValue()
+            // .addOnCompleteListener(task -> Utils.toast(this, "Message deleted!"))
+            .addOnFailureListener(ex -> Utils.toast(this, ex.getMessage()));
     }
 }

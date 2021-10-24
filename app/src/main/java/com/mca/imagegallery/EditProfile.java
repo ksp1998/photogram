@@ -18,6 +18,10 @@ import android.widget.TextView;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.mca.imagegallery.Model.User;
+import com.mca.imagegallery.helper.NavMenu;
+import com.mca.imagegallery.helper.Permissions;
+import com.mca.imagegallery.helper.Utils;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -200,7 +204,7 @@ public class EditProfile extends AppCompatActivity {
             new AlertDialog.Builder(this)
                     .setTitle("Confirmation")
                     .setMessage("Unsaved changes?")
-                    .setIcon(R.drawable.ic_launcher_background)
+                    .setIcon(R.drawable.logo)
                     .setPositiveButton("Yes", (dialog, which) -> finish())
                     .setNegativeButton("Cancel", null)
                     .show();

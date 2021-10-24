@@ -24,13 +24,12 @@
     <string name="next">Next</string>
     <string name="recent_message_example_text">Hey there!</string>
     <string name="search">Search</string>
-    <string name="see_more">See More</string>
     <string name="sign_up">Sign Up</string>
     <string name="tnc_text">By signing up, you agree to Photo\'s Terms of Service and Privacy Policy.</string>
     <string name="user">Jane</string>
     <string name="user_city">San Francisco, CA</string>
     <string name="user_id">jane@123</string>
-    <string name="what_s_new_today">What\'s new today</string>
+    <string name="recently_added">Recently added</string>
     <string name="register_here">Register here</string>
     <string name="login_here">Login here</string>
     <string name="no_photos_yet">No photos yet!</string>
@@ -40,4 +39,6 @@
     <string name="profile">Profile</string>
     <string name="logout">Logout</string>
     <string name="change_profile_photo">Change Profile Photo</string>
+    <string name="search_users">Search users</string>
+    <string name="no_users_found">No users found !</string>
 </resources>

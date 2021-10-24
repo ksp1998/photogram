@@ -1,29 +1,44 @@
-package com.mca.imagegallery;
+package com.mca.imagegallery.helper;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.mca.imagegallery.R;
+
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class Utils {
 
-    public final static String LOGIN_SHARED_FILE = "shared_file";
+    public final static String LOGIN_SHARED_FILE = "login_preferences";
     public final static String RECENT_USER_SHARED_FILE = "recent_user";
 
     public static void toast(Activity activity, String msg) {
         Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    public static String getID(String email) {
+        return email.replace('.', '_');
+    }
+
+    public static String capitalize(String str) {
+        String s = "";
+        for (int i = 0; i < str.length(); i++) {
+            if(i == 0 || str.charAt(i-1) == ' ') {
+                str = str.substring(0, i) + ("" + str.charAt(i)).toUpperCase() + str.substring(i+1);
+            }
+        }
+        return str;
     }
 
     public static byte[] compressImage(Activity activity, Uri imageUri) throws IOException {
@@ -32,6 +47,16 @@ public class Utils {
         bitmap.compress(Bitmap.CompressFormat.JPEG, 20, baos);
         return baos.toByteArray();
     }
+
+//    public static String getDate(long ms) {
+//        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+//        Date date = new Date(ms);
+//        return dateFormat.format(date);
+//    }
+//
+//    public static boolean isTodaysDate(long ms1, long ms2) {
+//        return getDate(ms1).equals(getDate(ms2));
+//    }
 
 //    public static void getOrientedImage(Activity activity, Uri uri) {
 //        Bitmap bitmap, rotatedBitmap;
@@ -93,12 +118,8 @@ public class Utils {
 
         return new AlertDialog.Builder(activity)
             .setTitle("Pick Action")
-            .setIcon(R.drawable.ic_launcher_background)
+            .setIcon(R.drawable.logo)
             .setView(layout)
             .create();
-    }
-
-    public static String getID(String email) {
-        return email.replace('.', '_');
     }
 }

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/copy"
+        android:title="Copy message" />
+    <item
+        android:id="@+id/delete"
+        android:title="Delete message">
+        <menu>
+            <item
+                android:id="@+id/delete_for_me"
+                android:title="Delete for me" />
+            <item
+                android:id="@+id/delete_for_both"
+                android:title="Delete for both" />
+        </menu>
+    </item>
+    <item
+        android:id="@+id/cancel"
+        android:title="Cancel" />
+</menu>

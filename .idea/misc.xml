@@ -7,12 +7,16 @@
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/drawable/$menu_ic_new__0.xml" value="0.2703125" />
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/drawable/add_bg.xml" value="0.2703125" />
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/drawable/border_bottom.xml" value="0.2703125" />
+        <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/drawable/border_top.xml" value="0.2703125" />
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/drawable/btn_login.xml" value="0.2703125" />
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/drawable/btn_register.xml" value="0.2703125" />
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/drawable/circle.xml" value="0.2703125" />
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/drawable/ic_back.xml" value="0.2703125" />
+        <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/drawable/ic_camera.xml" value="0.14635416666666667" />
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/drawable/ic_close.xml" value="0.2703125" />
+        <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/drawable/ic_gallery.xml" value="0.14635416666666667" />
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/drawable/ic_launcher_background.xml" value="0.2703125" />
+        <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/drawable/ic_launcher_foreground.xml" value="0.14635416666666667" />
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/drawable/ic_logout.xml" value="0.2703125" />
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/drawable/ic_profile.xml" value="0.14635416666666667" />
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/drawable/ic_send.xml" value="0.2703125" />
@@ -47,6 +51,10 @@
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/layout/message_sent.xml" value="0.25416666666666665" />
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/layout/nav_menu.xml" value="0.25416666666666665" />
         <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/layout/user_card.xml" value="0.72" />
+        <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/menu/message_options_menu.xml" value="0.25416666666666665" />
+        <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/menu/user_image_options_menu.xml" value="0.25416666666666665" />
+        <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.2703125" />
+        <entry key="..\:/MCA Data/SEM V/WMT Lab/ImageGallery/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.2703125" />
       </map>
     </option>
   </component>

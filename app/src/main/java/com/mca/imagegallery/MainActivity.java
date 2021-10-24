@@ -13,6 +13,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.mca.imagegallery.helper.Utils;
 import com.squareup.picasso.Picasso;
 
 public class MainActivity extends AppCompatActivity {
@@ -54,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
             ImageView ivProfile = userCard.findViewById(R.id.iv_profile);
             TextView tvName = userCard.findViewById(R.id.tv_name);
-            TextView tvEmail = userCard.findViewById(R.id.tv_email);
+            TextView tvEmail = userCard.findViewById(R.id.tv_user_id);
 
             Picasso.get().load(sp.getString("profile_url", null)).into(ivProfile);
             tvName.setText(sp.getString("name", null));

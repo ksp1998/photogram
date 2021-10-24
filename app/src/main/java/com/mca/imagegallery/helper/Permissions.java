@@ -1,4 +1,4 @@
-package com.mca.imagegallery;
+package com.mca.imagegallery.helper;
 
 import android.Manifest;
 import android.app.Activity;

@@ -1,19 +1,29 @@
-package com.mca.imagegallery;
+package com.mca.imagegallery.Model;
 
 import com.google.firebase.Timestamp;
 
 public class Image {
 
+    long id;
     String description;
     Timestamp upload_date;
     String url;
 
     public Image() {}
 
-    public Image(String description, Timestamp upload_date, String url) {
+    public Image(long id, String description, Timestamp upload_date, String url) {
+        this.id = id;
         this.description = description;
         this.upload_date = upload_date;
         this.url = url;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getDescription() {

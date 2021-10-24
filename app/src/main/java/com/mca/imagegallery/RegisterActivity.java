@@ -4,19 +4,18 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.mca.imagegallery.Model.User;
+import com.mca.imagegallery.helper.Utils;
 
 public class RegisterActivity extends AppCompatActivity {
 
     private EditText etName, etCity, etEmail, etPassword;
-    private Button btnBack;
-    private Button btnSignUp;
+    private Button btnBack, btnSignUp;
     private TextView linkLogin;
     private ProgressDialog pd;
 

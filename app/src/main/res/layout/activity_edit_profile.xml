@@ -36,6 +36,7 @@
         android:id="@+id/tv_change_profile_photo"
         android:paddingVertical="12dp"
         android:layout_gravity="center"
+        android:textColor="@color/link"
         android:text="@string/change_profile_photo"
         style="@style/sub_title" />
 
@@ -52,13 +53,6 @@
         android:hint="@string/city_hint"
         android:inputType="textPersonName"
         style="@style/input_text" />
-
-<!--    <EditText-->
-<!--        android:id="@+id/et_password"-->
-<!--        android:text="@string/example_password"-->
-<!--        android:hint="@string/password_hint"-->
-<!--        android:inputType="textVisiblePassword"-->
-<!--        style="@style/input_text" />-->
 
     <Button
         android:id="@+id/btn_update"

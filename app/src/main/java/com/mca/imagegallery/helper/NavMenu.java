@@ -1,4 +1,4 @@
-package com.mca.imagegallery;
+package com.mca.imagegallery.helper;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -11,10 +11,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.MediaStore;
-import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
 
@@ -22,14 +19,19 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.squareup.picasso.Picasso;
+import com.mca.imagegallery.ChatListActivity;
+import com.mca.imagegallery.EditProfile;
+import com.mca.imagegallery.HomeActivity;
+import com.mca.imagegallery.Model.GalleryImage;
+import com.mca.imagegallery.Model.Image;
+import com.mca.imagegallery.MyProfileActivity;
+import com.mca.imagegallery.R;
+import com.mca.imagegallery.SearchActivity;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import okhttp3.internal.Util;
 
 public class NavMenu {
 
@@ -121,7 +123,7 @@ public class NavMenu {
         }
     }
 
-    protected static void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    public static void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if(requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             if(activity.getClass() != EditProfile.class) {
                 uploadImage();
@@ -156,8 +158,8 @@ public class NavMenu {
     }
 
     private static void uploadImageToFirebaseStorage(byte[] bytes) {
-
-        reference = storage.getReference().child("imagegallery-ks/" + id + "/" + file.getName());
+        long imageId = System.currentTimeMillis();
+        reference = storage.getReference().child("imagegallery-ks/" + id + "/" + imageId);
         reference.putBytes(bytes)
             .addOnCompleteListener(task -> {
                 if(task.isSuccessful()) {
@@ -165,16 +167,22 @@ public class NavMenu {
                         .addOnSuccessListener(uri -> {
                             String name = sp.getString("name", null);
                             url = uri.toString();
-                            Image image = new Image(name.concat("'s image"), Timestamp.now(), url);
 
-                            uploadImageUrlToFirestore(image);
+                            Image image = new Image(imageId, name.concat("'s image"), Timestamp.now(), url);
+                            uploadImageUrlToFirestoreUsers(image);
+
+                            GalleryImage galleryImage = new GalleryImage(imageId, url, db.collection("users").document(id));
+                            uploadImageUrlToFirestoreImages(galleryImage);
                         })
-                        .addOnFailureListener(ex -> Utils.toast(activity, ex.getMessage()));
+                        .addOnFailureListener(ex -> {
+                            Utils.toast(activity, ex.getMessage());
+                            pd.dismiss();
+                        });
                 }
                 else {
                     Utils.toast(activity, task.getException().getMessage());
+                    pd.dismiss();
                 }
-                pd.dismiss();
             })
             .addOnFailureListener(ex -> {
                 Utils.toast(activity, ex.getMessage());
@@ -182,7 +190,7 @@ public class NavMenu {
             });
     }
 
-    private static void uploadImageUrlToFirestore(Image image) {
+    private static void uploadImageUrlToFirestoreUsers(Image image) {
 
         db.collection("users")
             .document(id)
@@ -200,23 +208,19 @@ public class NavMenu {
                 } else {
                     Utils.toast(activity, task.getException().getMessage());
                 }
+                pd.dismiss();
             })
-            .addOnFailureListener(ex -> Utils.toast(activity, ex.getMessage()));
+            .addOnFailureListener(ex -> {
+                Utils.toast(activity, ex.getMessage());
+                pd.dismiss();
+            });
     }
 
-    private static void updateUserGallery() {
-        ImageView imageView = (ImageView) activity.getLayoutInflater().inflate(R.layout.gallery_image, null);
-        Picasso.get().load(imageUri).into(imageView);
+    private static void uploadImageUrlToFirestoreImages(GalleryImage image) {
 
-        LinearLayout userGalleryLeft = activity.findViewById(R.id.user_gallery_left);
-        LinearLayout userGalleryRight = activity.findViewById(R.id.user_gallery_right);
-
-        activity.findViewById(R.id.tv_no_photo).setVisibility(View.GONE);
-
-        if(userGalleryRight.getChildCount() < userGalleryLeft.getChildCount()) {
-            userGalleryRight.addView(imageView, 0);
-        } else {
-            userGalleryLeft.addView(imageView, 0);
-        }
+        db.collection("images")
+            .document(String.valueOf(image.getId()))
+            .set(image)
+            .addOnFailureListener(ex -> Utils.toast(activity, ex.getMessage()));
     }
 }

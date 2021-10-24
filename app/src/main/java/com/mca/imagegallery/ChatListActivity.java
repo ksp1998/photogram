@@ -2,8 +2,10 @@ package com.mca.imagegallery;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -11,14 +13,18 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.mca.imagegallery.Model.User;
+import com.mca.imagegallery.helper.NavMenu;
+import com.mca.imagegallery.helper.Permissions;
+import com.mca.imagegallery.helper.Utils;
 import com.squareup.picasso.Picasso;
 
 public class ChatListActivity extends AppCompatActivity {
     private LinearLayout chatCard;
     private LinearLayout chatCardContainer;
+    private ProgressBar progressBar;
 
     private FirebaseFirestore db;
     private FirebaseDatabase database;
@@ -30,6 +36,7 @@ public class ChatListActivity extends AppCompatActivity {
         new NavMenu(this);
 
         chatCardContainer = findViewById(R.id.chat_card_container);
+        progressBar = findViewById(R.id.progress_bar);
 
         db = FirebaseFirestore.getInstance();
         database = FirebaseDatabase.getInstance();
@@ -38,6 +45,7 @@ public class ChatListActivity extends AppCompatActivity {
 
     private void listUsers() {
         String id = Utils.getID(getSharedPreferences(Utils.LOGIN_SHARED_FILE, MODE_PRIVATE).getString("email", null));
+        progressBar.setVisibility(View.VISIBLE);
 
         database.getReference()
             .child(id)
@@ -51,8 +59,12 @@ public class ChatListActivity extends AppCompatActivity {
                 } else {
                     Utils.toast(this, task.getException().getMessage());
                 }
+                progressBar.setVisibility(View.GONE);
             })
-            .addOnFailureListener(ex -> Utils.toast(this, ex.getMessage()));
+            .addOnFailureListener(ex -> {
+                Utils.toast(this, ex.getMessage());
+                progressBar.setVisibility(View.GONE);
+            });
     }
 
     private void setChatUser(String id) {

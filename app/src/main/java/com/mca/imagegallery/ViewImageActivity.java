@@ -45,7 +45,7 @@ public class ViewImageActivity extends AppCompatActivity {
     private void loadImage() {
         Picasso.get().load(profile_url).into(ivProfile);
         tvName.setText(name);
-        tvUserId.setText(email.substring(0, email.lastIndexOf('.')));
+        tvUserId.setText("@".concat(email.substring(0, email.lastIndexOf('@'))));
         Picasso.get().load(image_url).into(imageView);
     }
 
