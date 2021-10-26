@@ -3,6 +3,7 @@ package com.mca.imagegallery;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
@@ -27,6 +28,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.mca.imagegallery.Model.Message;
+import com.mca.imagegallery.Model.User;
 import com.mca.imagegallery.helper.Utils;
 import com.squareup.picasso.Picasso;
 
@@ -39,6 +41,7 @@ public class ChatActivity extends AppCompatActivity {
     private ScrollView scroller;
     private ProgressBar progressBar;
     private String receiverId, senderId, receiverProfile, senderProfile;
+    private String name, city, email, profile_url;
 
     private FirebaseDatabase database;
     private DatabaseReference reference;
@@ -55,18 +58,36 @@ public class ChatActivity extends AppCompatActivity {
         scroller = findViewById(R.id.scroller);
         progressBar = findViewById(R.id.progress_bar);
 
-        tvTitle.setText(getIntent().getStringExtra("name"));
+
+        name = getIntent().getStringExtra("name");
+        email = getIntent().getStringExtra("email");
+        city = getIntent().getStringExtra("city");
+        profile_url = getIntent().getStringExtra("profile_url");
+
+
+        tvTitle.setText(name);
+        tvTitle.setOnClickListener(view -> gotoProfile());
         btnBack.setOnClickListener(view -> super.onBackPressed());
         btnSend.setOnClickListener(view -> sendMessage());
 
-        receiverId = Utils.getID(getIntent().getStringExtra("email"));
+        receiverId = Utils.getID(email);
         senderId = Utils.getID(getSharedPreferences(Utils.LOGIN_SHARED_FILE, MODE_PRIVATE).getString("email", null));
-        receiverProfile = getIntent().getStringExtra("profile_url");
+        receiverProfile = profile_url;
         senderProfile = getSharedPreferences(Utils.LOGIN_SHARED_FILE, MODE_PRIVATE).getString("profile_url", null);
 
         database = FirebaseDatabase.getInstance();
 
         receiveMessage();
+    }
+
+    private void gotoProfile() {
+        Intent intent = new Intent(this, MyProfileActivity.class);
+        intent.putExtra("profile_url", profile_url);
+        intent.putExtra("name", name);
+        intent.putExtra("city", city);
+        intent.putExtra("email", email);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(intent);
     }
 
     private void sendMessage() {

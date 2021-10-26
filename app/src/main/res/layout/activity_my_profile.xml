@@ -22,12 +22,13 @@
             android:layout_alignParentStart="true"
             android:visibility="gone" />
 
-        <Button
+        <ImageButton
             android:id="@+id/btn_logout"
-            android:background="@drawable/ic_logout"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginEnd="16dp"
+            android:src="@drawable/ic_logout"
+            android:background="#00FFFFFF"
+            android:layout_width="28dp"
+            android:layout_height="22.86dp"
+            android:layout_marginEnd="12dp"
             android:tooltipText="@string/logout"
             android:layout_alignParentEnd="true"
             android:layout_centerInParent="true" />
@@ -40,6 +41,7 @@
     </RelativeLayout>
 
     <ScrollView
+        android:id="@+id/main_content"
         android:scrollbarSize="0dp"
         android:paddingHorizontal="16dp"
         android:visibility="visible"
@@ -140,12 +142,6 @@
                 android:layout_centerHorizontal="true"
                 android:text="@string/no_photos_yet"
                 style="@style/sub_title" />
-
-<!--            <Button-->
-<!--                android:layout_marginTop="32dp"-->
-<!--                android:layout_marginBottom="32dp"-->
-<!--                android:text="@string/see_more"-->
-<!--                style="@style/button_light"/>-->
 
         </LinearLayout>
 

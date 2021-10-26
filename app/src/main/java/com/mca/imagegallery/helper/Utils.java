@@ -1,22 +1,30 @@
 package com.mca.imagegallery.helper;
 
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
+import android.transition.Transition;
+import android.transition.TransitionInflater;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.mca.imagegallery.HomeActivity;
 import com.mca.imagegallery.R;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 public class Utils {
 
@@ -31,76 +39,12 @@ public class Utils {
         return email.replace('.', '_');
     }
 
-    public static String capitalize(String str) {
-        String s = "";
-        for (int i = 0; i < str.length(); i++) {
-            if(i == 0 || str.charAt(i-1) == ' ') {
-                str = str.substring(0, i) + ("" + str.charAt(i)).toUpperCase() + str.substring(i+1);
-            }
-        }
-        return str;
-    }
-
     public static byte[] compressImage(Activity activity, Uri imageUri) throws IOException {
         Bitmap bitmap = MediaStore.Images.Media.getBitmap(activity.getContentResolver(), imageUri);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 20, baos);
         return baos.toByteArray();
     }
-
-//    public static String getDate(long ms) {
-//        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-//        Date date = new Date(ms);
-//        return dateFormat.format(date);
-//    }
-//
-//    public static boolean isTodaysDate(long ms1, long ms2) {
-//        return getDate(ms1).equals(getDate(ms2));
-//    }
-
-//    public static void getOrientedImage(Activity activity, Uri uri) {
-//        Bitmap bitmap, rotatedBitmap;
-//        try {
-//            bitmap = BitmapFactory.decodeFile(uri.toString());
-//
-//            ExifInterface ei = new ExifInterface(uri.toString());
-//            int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
-//
-//            switch (orientation) {
-//                case ExifInterface.ORIENTATION_ROTATE_90:
-//                    rotatedBitmap = rotateImage(bitmap, 90);
-//                    break;
-//
-//                case ExifInterface.ORIENTATION_ROTATE_180:
-//                    rotatedBitmap = rotateImage(bitmap, 180);
-//                    break;
-//
-//                case ExifInterface.ORIENTATION_ROTATE_270:
-//                    rotatedBitmap = rotateImage(bitmap, 270);
-//                    break;
-//
-//                case ExifInterface.ORIENTATION_NORMAL:
-//                default:
-//                    rotatedBitmap = bitmap;
-//            }
-//            if (rotatedBitmap != bitmap) {
-//                FileOutputStream fOut = new FileOutputStream(uri.toString());
-//                rotatedBitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut);
-//                fOut.flush();
-//                fOut.close();
-//            }
-//            bitmap.recycle();
-//            rotatedBitmap.recycle();
-//        } catch (IOException ex) {
-//            Utils.toast(activity, ex.getMessage());
-//        }
-//    }
-
-//    public static Bitmap rotateImage(Bitmap source, float angle) {
-//        Matrix matrix = new Matrix();
-//        matrix.postRotate(angle);
-//        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
-//    }
 
     public static ProgressDialog progressDialog(Activity activity, String msg) {
         ProgressDialog pd = new ProgressDialog(activity);
@@ -121,5 +65,40 @@ public class Utils {
             .setIcon(R.drawable.logo)
             .setView(layout)
             .create();
+    }
+
+    public static void setTransitions(Activity activity, int enter, int exit) {
+        Transition enterTransition = TransitionInflater.from(activity).inflateTransition(enter);
+        activity.getWindow().setEnterTransition(enterTransition);
+        Transition exitTransition = TransitionInflater.from(activity).inflateTransition(exit);
+        activity.getWindow().setExitTransition(exitTransition);
+    }
+
+    public static Bundle getAnimationBundle(Activity activity) {
+        return ActivityOptions.makeSceneTransitionAnimation(activity).toBundle();
+    }
+
+    public static void startActivity(Activity activity, Class destination) {
+        Intent intent = new Intent(activity, destination);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        activity.startActivity(intent);
+    }
+
+    public static void saveImage(Activity activity, ImageView imageView) {
+
+        Bitmap bitmap = ( (BitmapDrawable) imageView.getDrawable()).getBitmap();
+
+        File storageLoc = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        File file = new File(storageLoc, System.currentTimeMillis() + ".jpg");
+        try {
+            FileOutputStream fos = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            fos.close();
+
+            Utils.toast(activity, "Image saved to gallery...");
+        }
+        catch (IOException ex) {
+            Utils.toast(activity, ex.getMessage());
+        }
     }
 }

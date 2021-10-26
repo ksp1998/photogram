@@ -46,7 +46,7 @@ public class SearchActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                showResults(Utils.capitalize(charSequence.toString()));
+                showResults(charSequence.toString().trim().toLowerCase());
             }
 
             @Override
@@ -61,8 +61,7 @@ public class SearchActivity extends AppCompatActivity {
     private void showResults(String searchText) {
 
         db.collection("users")
-            .whereGreaterThanOrEqualTo("name", searchText)
-            .whereLessThanOrEqualTo("name", searchText + "\uf8ff")
+            .orderBy("name")
             .get()
             .addOnCompleteListener(task -> {
                 if(task.isSuccessful()) {
@@ -70,10 +69,9 @@ public class SearchActivity extends AppCompatActivity {
                     userList.removeAllViews();
 
                     List<User> users = task.getResult().toObjects(User.class);
-                    if(users.size() > 0) {
-                        tvNoResult.setVisibility(TextView.GONE);
+                    for (User user : users) {
 
-                        for (User user : users) {
+                        if(user.getName().toLowerCase().contains(searchText) || "@".concat(user.getEmail()).contains(searchText)) {
 
                             LinearLayout userCard = (LinearLayout) getLayoutInflater().inflate(R.layout.user_card, null);
                             userCard.setBackground(getDrawable(R.drawable.border_top));
@@ -90,6 +88,9 @@ public class SearchActivity extends AppCompatActivity {
                             userList.addView(userCard);
                         }
                     }
+                    if(userList.getChildCount() > 0) {
+                        tvNoResult.setVisibility(TextView.GONE);
+                    }
                 }
                 else {
                     Utils.toast(this, task.getException().getMessage());
@@ -105,6 +106,7 @@ public class SearchActivity extends AppCompatActivity {
         intent.putExtra("name", user.getName());
         intent.putExtra("city", user.getCity());
         intent.putExtra("email", user.getEmail());
+        intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
     }
 
@@ -118,5 +120,11 @@ public class SearchActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         NavMenu.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+        overridePendingTransition(0, 0);
     }
 }

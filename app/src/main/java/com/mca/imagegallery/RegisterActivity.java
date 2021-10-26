@@ -48,14 +48,9 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
-        linkLogin.setOnClickListener(view -> startActivity(new Intent(this, LoginActivity.class)));
+        linkLogin.setOnClickListener(view -> startActivity(new Intent(this, LoginActivity.class).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)));
 
         db = FirebaseFirestore.getInstance();
-    }
-
-    @Override
-    public void onBackPressed() {
-        startActivity(new Intent(this, MainActivity.class));
     }
 
     private boolean validateData(String name, String email, String city, String password) {
@@ -132,11 +127,17 @@ public class RegisterActivity extends AppCompatActivity {
                     Utils.toast(this, "User has been registered successfully...");
                     Intent intent = new Intent(this, LoginActivity.class);
                     intent.putExtra("email", user.getEmail());
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                     startActivity(intent);
                 } else {
                     Utils.toast(this, task.getException().getMessage());
                 }
                 pd.dismiss();
             });
+    }
+
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(this, MainActivity.class));
     }
 }

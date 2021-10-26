@@ -17,12 +17,13 @@
         android:layout_weight="1">
 
         <TextView
-            android:textSize="48sp"
-            android:text="@string/title"
-            android:drawablePadding="8dp"
+            style="@style/title"
             android:layout_centerInParent="true"
-            app:drawableStartCompat="@drawable/logo"
-            style="@style/title" />
+            android:drawablePadding="8dp"
+            android:gravity="center"
+            android:text="@string/title"
+            android:textSize="32sp"
+            app:drawableStartCompat="@drawable/logo" />
 
 <!--        <include-->
 <!--            android:layout_width="match_parent"-->

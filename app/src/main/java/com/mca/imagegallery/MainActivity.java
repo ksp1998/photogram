@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sp = getSharedPreferences(Utils.LOGIN_SHARED_FILE, MODE_PRIVATE);
         if(sp.getString("email", null) != null) {
             startActivity(new Intent(this, HomeActivity.class));
+            overridePendingTransition(0, 0);
         }
     }
 

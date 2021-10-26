@@ -60,23 +60,27 @@ public class NavMenu {
         Button btnChat = activity.findViewById(R.id.btn_chat);
         Button btnMyProfile = activity.findViewById(R.id.btn_my_profile);
 
-        btnHome.setOnClickListener(view -> activity.startActivity(new Intent(activity, HomeActivity.class)));
-        btnSearch.setOnClickListener(view -> activity.startActivity(new Intent(activity, SearchActivity.class)));
-        btnChat.setOnClickListener(view -> activity.startActivity(new Intent(activity, ChatListActivity.class)));
-        btnMyProfile.setOnClickListener(view -> activity.startActivity(new Intent(activity, MyProfileActivity.class)));
+        btnHome.setOnClickListener(view -> Utils.startActivity(activity, HomeActivity.class));
+        btnSearch.setOnClickListener(view -> Utils.startActivity(activity, SearchActivity.class));
+        btnChat.setOnClickListener(view -> Utils.startActivity(activity, ChatListActivity.class));
+        btnMyProfile.setOnClickListener(view -> Utils.startActivity(activity, MyProfileActivity.class));
 
         Class<? extends Activity> aClass = activity.getClass();
         if (HomeActivity.class.equals(aClass)) {
             btnHome.setOnClickListener(null);
+            btnHome.setBackground(activity.getDrawable(R.drawable.menu_ic_home_active));
         }
         if (SearchActivity.class.equals(aClass)) {
             btnSearch.setOnClickListener(null);
+            btnSearch.setBackground(activity.getDrawable(R.drawable.menu_ic_search_active));
         }
         if (ChatListActivity.class.equals(aClass)) {
             btnChat.setOnClickListener(null);
+            btnChat.setBackground(activity.getDrawable(R.drawable.menu_ic_chat_active));
         }
         if (MyProfileActivity.class.equals(aClass)) {
             btnMyProfile.setOnClickListener(null);
+            btnMyProfile.setBackground(activity.getDrawable(R.drawable.menu_ic_user_active));
         }
 
         btnAdd.setOnClickListener(view -> {
@@ -118,8 +122,8 @@ public class NavMenu {
         }
 
         if(Permissions.checkPermissions(activity)) {
-            Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-            activity.startActivityForResult(gallery, GALLERY_REQUEST);
+            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+            activity.startActivityForResult(intent, GALLERY_REQUEST);
         }
     }
 

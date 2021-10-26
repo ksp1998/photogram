@@ -61,16 +61,4 @@
         android:text="@string/login_here"
         android:fontFamily="@font/roboto" />
 
-<!--    <TextView-->
-<!--        android:textSize="13sp"-->
-<!--        android:textColor="@color/black"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginHorizontal="24dp"-->
-<!--        android:layout_marginBottom="12dp"-->
-<!--        android:text="@string/tnc_text"-->
-<!--        android:lineSpacingExtra="3sp"-->
-<!--        android:translationY="1.38sp"-->
-<!--        android:fontFamily="@font/roboto" />-->
-
 </LinearLayout>

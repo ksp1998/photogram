@@ -11,6 +11,7 @@
         style="@style/bar_title" />
 
     <ScrollView
+        android:id="@+id/main_content"
         android:scrollbarSize="0dp"
         android:visibility="visible"
         android:layout_width="match_parent"

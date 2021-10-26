@@ -10,6 +10,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -32,7 +33,8 @@ import java.util.List;
 public class MyProfileActivity extends AppCompatActivity {
     private ImageView ivProfile;
     private TextView tvName, tvCity, tvNoPhoto;
-    private Button btnBack, btnLogout, btnMessage, btnEdit;
+    private Button btnBack, btnMessage, btnEdit;
+    private ImageButton btnLogout;
     private LinearLayout userGalleryLeft;
     private LinearLayout userGalleryRight;
     private String email, name, city, profile_url;
@@ -100,11 +102,12 @@ public class MyProfileActivity extends AppCompatActivity {
         btnEdit.setVisibility(View.GONE);
         btnMessage.setVisibility(View.VISIBLE);
 
-        btnBack.setOnClickListener(view -> super.onBackPressed());
+        btnBack.setOnClickListener(view -> onBackPressed());
         btnMessage.setOnClickListener(view -> {
             Intent intent = new Intent(this, ChatActivity.class);
             intent.putExtra("name", name);
             intent.putExtra("email", email);
+            intent.putExtra("city", city);
             intent.putExtra("profile_url", profile_url);
             startActivity(intent);
         });
@@ -169,7 +172,7 @@ public class MyProfileActivity extends AppCompatActivity {
         intent.putExtra("name", name);
         intent.putExtra("email", email);
         intent.putExtra("image_url", image.getUrl());
-        startActivity(intent);
+        startActivity(intent, Utils.getAnimationBundle(this));
     }
 
     @Override
@@ -207,6 +210,9 @@ public class MyProfileActivity extends AppCompatActivity {
         switch(item.getItemId()) {
             case R.id.view:
                 viewImage(image);
+                break;
+            case R.id.save:
+                Utils.saveImage(this, imageView);
                 break;
             case R.id.delete:
                 deleteUserImage();
@@ -259,5 +265,11 @@ public class MyProfileActivity extends AppCompatActivity {
         Picasso.get().load(profile_url).into(ivProfile);
         tvName.setText(name);
         tvCity.setText(city);
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+        overridePendingTransition(0, 0);
     }
 }

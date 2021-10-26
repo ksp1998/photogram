@@ -32,7 +32,7 @@ public class LoginActivity extends AppCompatActivity {
 
         btnBack.setOnClickListener(view -> onBackPressed());
         btnLogin.setOnClickListener(view -> login());
-        linkRegister.setOnClickListener(view -> startActivity(new Intent(this, RegisterActivity.class)));
+        linkRegister.setOnClickListener(view -> startActivity(new Intent(this, RegisterActivity.class).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)));
 
         String recentUserEmail = getIntent().getStringExtra("email");
         if(recentUserEmail != null) {

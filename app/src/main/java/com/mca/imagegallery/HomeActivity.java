@@ -4,6 +4,10 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -16,7 +20,6 @@ import androidx.core.app.ActivityCompat;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.mca.imagegallery.Model.GalleryImage;
-import com.mca.imagegallery.Model.Image;
 import com.mca.imagegallery.Model.User;
 import com.mca.imagegallery.helper.NavMenu;
 import com.mca.imagegallery.helper.Permissions;
@@ -112,12 +115,15 @@ public class HomeActivity extends AppCompatActivity {
             Picasso.get().load(image.getUrl()).into(imageView);
 
             image.getUser()
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        User user = task.getResult().toObject(User.class);
-                        imageView.setOnClickListener(view -> viewImage(image.getUrl(), user));
-                    })
-                    .addOnFailureListener(ex -> Utils.toast(this, ex.getMessage()));
+                .get()
+                .addOnCompleteListener(task -> {
+                    User user = task.getResult().toObject(User.class);
+                    imageView.setOnClickListener(view -> viewImage(image.getUrl(), user));
+                    imageView.setTag(R.id.image_url, image.getUrl());
+                    imageView.setTag(R.id.user, user);
+                    registerForContextMenu(imageView);
+                })
+                .addOnFailureListener(ex -> Utils.toast(this, ex.getMessage()));
 
             if (galleryRight.getChildCount() < galleryLeft.getChildCount())
                 galleryRight.addView(imageView);
@@ -129,46 +135,6 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-    private void browseAllImages() {
-        galleryLeft.removeAllViews();
-        galleryRight.removeAllViews();
-
-        db.collection("users")
-            .get()
-            .addOnCompleteListener(task -> {
-                if(task.isSuccessful()) {
-                    List<User> users = task.getResult().toObjects(User.class);
-                    for (User user : users) {
-                        displayImages(user);
-                    }
-                } else {
-                    Utils.toast(this, task.getException().getMessage());
-                }
-            })
-            .addOnFailureListener(ex -> Utils.toast(this, ex.getMessage()));
-    }
-
-    private void displayImages(User user) {
-        db.collection("users")
-            .document(Utils.getID(user.getEmail()))
-            .collection("images")
-            .get()
-            .addOnCompleteListener(task -> {
-                List<Image> images = task.getResult().toObjects(Image.class);
-                int i = galleryLeft.getChildCount() + galleryRight.getChildCount();
-                for (Image image : images) {
-                    ImageView imageView = (ImageView) getLayoutInflater().inflate(R.layout.gallery_image, null);
-                    imageView.setOnClickListener(view -> viewImage(image.getUrl(), user));
-                    Picasso.get().load(image.getUrl()).into(imageView);
-
-                    if (i % 2 == 0) galleryLeft.addView(imageView);
-                    else galleryRight.addView(imageView);
-                    i++;
-                }
-            })
-            .addOnFailureListener(ex -> Utils.toast(this, ex.getMessage()));
-    }
-
     private void viewImage(String imageUrl, User user) {
         Intent intent = new Intent(this, ViewImageActivity.class);
         intent.putExtra("profile_url", user.getProfile_url());
@@ -176,7 +142,38 @@ public class HomeActivity extends AppCompatActivity {
         intent.putExtra("city", user.getCity());
         intent.putExtra("email", user.getEmail());
         intent.putExtra("image_url", imageUrl);
-        startActivity(intent);
+        startActivity(intent, Utils.getAnimationBundle(this));
+    }
+
+    private ImageView imageView;
+    private String imageUrl;
+    private User user;
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.user_image_options_menu, menu);
+        menu.findItem(R.id.delete).setVisible(false);
+
+        imageView = (ImageView) v;
+        imageUrl = (String) imageView.getTag(R.id.image_url);
+        user = (User) imageView.getTag(R.id.user);
+    }
+
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+
+        switch(item.getItemId()) {
+            case R.id.view:
+                viewImage(imageUrl, user);
+                break;
+            case R.id.save:
+                Utils.saveImage(this, imageView);
+                break;
+            case R.id.cancel: break;
+        }
+        return super.onContextItemSelected(item);
     }
 
     @Override
@@ -191,7 +188,6 @@ public class HomeActivity extends AppCompatActivity {
         NavMenu.onActivityResult(requestCode, resultCode, data);
     }
 
-    // Override function for exiting application when double back clicked
     private boolean doubleBackToExitPressedOnce = false;
     @Override
     public void onBackPressed() {

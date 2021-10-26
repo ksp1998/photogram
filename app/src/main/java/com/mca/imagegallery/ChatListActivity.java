@@ -95,19 +95,12 @@ public class ChatListActivity extends AppCompatActivity {
             Intent intent = new Intent(this, ChatActivity.class);
             intent.putExtra("email", user.getEmail());
             intent.putExtra("name", user.getName());
+            intent.putExtra("city", user.getCity());
             intent.putExtra("profile_url", user.getProfile_url());
             startActivity(intent);
         });
         chatCardContainer.addView(chatCard);
     }
-
-//    private void setChatUser(User user) {
-//        for (int i = 0; i < 10; i++) {
-//            LinearLayout chatCard = (LinearLayout) getLayoutInflater().inflate(R.layout.chat_card, null);
-//            chatCard.setOnClickListener(view -> startActivity(new Intent(this, ChatActivity.class)));
-//            chatCardContainer.addView(chatCard);
-//        }
-//    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -119,5 +112,11 @@ public class ChatListActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         NavMenu.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+        overridePendingTransition(0, 0);
     }
 }

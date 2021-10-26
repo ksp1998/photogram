@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ImageGallery</string>
+    <string name="app_name">Image Gallery</string>
     <string name="search_menu_title">Search</string>
     <string name="author">Iron Man</string>
     <string name="author_id">ironman@82</string>
@@ -9,7 +9,7 @@
     <string name="log_in">Log In</string>
     <string name="password_hint">Password</string>
     <string name="register">Register</string>
-    <string name="title">photo</string>
+    <string name="title">Image Gallery</string>
     <string name="todo">TODO</string>
     <string name="all_results">All Results</string>
     <string name="browse_all">Browse all</string>
@@ -25,7 +25,6 @@
     <string name="recent_message_example_text">Hey there!</string>
     <string name="search">Search</string>
     <string name="sign_up">Sign Up</string>
-    <string name="tnc_text">By signing up, you agree to Photo\'s Terms of Service and Privacy Policy.</string>
     <string name="user">Jane</string>
     <string name="user_city">San Francisco, CA</string>
     <string name="user_id">jane@123</string>

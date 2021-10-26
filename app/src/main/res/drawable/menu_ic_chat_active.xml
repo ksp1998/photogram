@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:height="40dp"
+    android:width="70dp"
+    android:viewportWidth="70"
+    android:viewportHeight="40">
+
+    <group
+        android:translateX="32"
+        android:translateY="10">
+        <path
+            android:pathData="M10 17.5C15.5225 17.5 20 13.5825 20 8.75C20 3.9175 15.5225 0 10 0C4.4775 0 0 3.9175 0 8.75C0 10.95 0.92875 12.9625 2.4625 14.5C2.34125 15.77 1.94125 17.1625 1.49875 18.2075C1.4 18.44 1.59125 18.7 1.84 18.66C4.66 18.1975 6.33625 17.4875 7.065 17.1175C8.02239 17.3728 9.00915 17.5014 10 17.5V17.5Z"
+            android:fillColor="#bb000000" />
+    </group>
+
+</vector>

@@ -40,9 +40,11 @@
         android:textSize="16sp"
         android:layout_below="@+id/container"
         android:layout_centerHorizontal="true"
-        android:text="@string/no_users_found" />
+        android:text="@string/no_users_found"
+        android:visibility="gone"/>
 
     <ScrollView
+        android:id="@+id/main_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginHorizontal="24dp"

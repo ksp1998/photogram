@@ -49,7 +49,7 @@
             android:layout_marginLeft="5dp"
             :layout_marginRight="5dp"
             android:layout_centerInParent="true"
-            android:layout_toStartOf="@+id/close"
+            android:layout_toStartOf="@+id/btn_close"
             android:layout_toEndOf="@+id/profile_view">
 
             <TextView
@@ -76,7 +76,7 @@
 
         <Button
             android:textColor="@color/white"
-            android:id="@+id/close"
+            android:id="@+id/btn_close"
             android:background="@drawable/ic_close"
             android:layout_width="32dp"
             android:layout_height="32dp"
