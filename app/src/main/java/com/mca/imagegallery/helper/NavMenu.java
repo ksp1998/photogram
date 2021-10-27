@@ -3,7 +3,6 @@ package com.mca.imagegallery.helper;
 import static android.content.Context.MODE_PRIVATE;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,7 +14,7 @@ import android.widget.Button;
 
 import androidx.annotation.Nullable;
 
-import com.google.firebase.Timestamp;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -36,7 +35,7 @@ import java.util.Date;
 public class NavMenu {
 
     private static Activity activity;
-    public static AlertDialog dialog = null;
+    public static BottomSheetDialog dialog = null;
     public static ProgressDialog pd;
     public static File file;
     public static Uri imageUri;
@@ -84,7 +83,8 @@ public class NavMenu {
         }
 
         btnAdd.setOnClickListener(view -> {
-            dialog = Utils.pickDialog(activity);
+//            dialog = Utils.pickDialog(activity);
+            dialog = Utils.imagePickDialog(activity);
             dialog.show();
         });
 
@@ -169,10 +169,9 @@ public class NavMenu {
                 if(task.isSuccessful()) {
                     reference.getDownloadUrl()
                         .addOnSuccessListener(uri -> {
-                            String name = sp.getString("name", null);
                             url = uri.toString();
 
-                            Image image = new Image(imageId, name.concat("'s image"), Timestamp.now(), url);
+                            Image image = new Image(imageId, url);
                             uploadImageUrlToFirestoreUsers(image);
 
                             GalleryImage galleryImage = new GalleryImage(imageId, url, db.collection("users").document(id));

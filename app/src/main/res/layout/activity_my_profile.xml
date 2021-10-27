@@ -31,7 +31,9 @@
             android:layout_marginEnd="12dp"
             android:tooltipText="@string/logout"
             android:layout_alignParentEnd="true"
-            android:layout_centerInParent="true" />
+            android:layout_centerInParent="true"
+            tools:targetApi="o"
+            android:contentDescription="@string/todo" />
 
         <TextView
             android:id="@+id/title"
@@ -68,7 +70,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/default_profile"
+                    android:src="@drawable/profile"
                     android:contentDescription="@string/todo" />
 
             </androidx.cardview.widget.CardView>
@@ -84,12 +86,6 @@
                 android:layout_marginBottom="24dp"
                 android:text="@string/user_city"
                 style="@style/sub_title" />
-
-<!--            <Button-->
-<!--                android:id="@+id/btn_follow"-->
-<!--                android:layout_marginVertical="12dp"-->
-<!--                android:text="@string/follow_user"-->
-<!--                style="@style/button_dark" />-->
 
             <Button
                 android:id="@+id/btn_message"
@@ -116,6 +112,8 @@
                     android:layout_height="wrap_content"
                     android:layout_toStartOf="@+id/divider">
 
+                    <include layout="@layout/gallery_image" />
+
                 </LinearLayout>
 
                 <View
@@ -131,6 +129,8 @@
                     android:layout_height="wrap_content"
                     android:layout_toEndOf="@+id/divider">
 
+                    <include layout="@layout/gallery_image" />
+
                 </LinearLayout>
 
             </RelativeLayout>
@@ -139,7 +139,6 @@
                 android:id="@+id/tv_no_photo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
                 android:text="@string/no_photos_yet"
                 style="@style/sub_title" />
 

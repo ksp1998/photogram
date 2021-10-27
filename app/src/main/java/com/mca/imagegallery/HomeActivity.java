@@ -62,7 +62,7 @@ public class HomeActivity extends AppCompatActivity {
             .addOnCompleteListener(task -> {
                 if(task.isSuccessful()) {
                     List<GalleryImage> images = task.getResult().toObjects(GalleryImage.class);
-                    setRecentImages(images);
+                    setRecentImages(images.subList(0, 10));
                     setBrowseAllImages(images);
                 } else {
                     Utils.toast(this, task.getException().getMessage());
@@ -73,10 +73,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private void setRecentImages(List<GalleryImage> images) {
 
-        int i = 0;
         for (GalleryImage image: images) {
-
-            if(i >= 10) break;
 
             LinearLayout card = (LinearLayout) getLayoutInflater().inflate(R.layout.home_card, null);
             ImageView imageView = card.findViewById(R.id.iv_home_img);
@@ -100,16 +97,15 @@ public class HomeActivity extends AppCompatActivity {
                 .addOnFailureListener(ex -> Utils.toast(this, ex.getMessage()));
 
             cardContainer.addView(card);
-            i++;
         }
     }
 
     private void setBrowseAllImages(List<GalleryImage> images) {
 
         if(images.size() > 0) {
-            int randomNum = new Random().nextInt(images.size());
+            int random = new Random().nextInt(images.size());
 
-            GalleryImage image = images.get(randomNum);
+            GalleryImage image = images.get(random);
 
             ImageView imageView = (ImageView) getLayoutInflater().inflate(R.layout.gallery_image, null);
             Picasso.get().load(image.getUrl()).into(imageView);
@@ -130,17 +126,14 @@ public class HomeActivity extends AppCompatActivity {
             else
                 galleryLeft.addView(imageView);
 
-            images.remove(randomNum);
+            images.remove(random);
             setBrowseAllImages(images);
         }
     }
 
     private void viewImage(String imageUrl, User user) {
         Intent intent = new Intent(this, ViewImageActivity.class);
-        intent.putExtra("profile_url", user.getProfile_url());
-        intent.putExtra("name", user.getName());
-        intent.putExtra("city", user.getCity());
-        intent.putExtra("email", user.getEmail());
+        intent = Utils.addUserToIntent(intent, user);
         intent.putExtra("image_url", imageUrl);
         startActivity(intent, Utils.getAnimationBundle(this));
     }
@@ -160,10 +153,8 @@ public class HomeActivity extends AppCompatActivity {
         user = (User) imageView.getTag(R.id.user);
     }
 
-
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {
-
         switch(item.getItemId()) {
             case R.id.view:
                 viewImage(imageUrl, user);

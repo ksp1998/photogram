@@ -25,12 +25,6 @@
             android:textSize="32sp"
             app:drawableStartCompat="@drawable/logo" />
 
-<!--        <include-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_alignParentBottom="true"-->
-<!--            layout="@layout/user_card" />-->
-
     </RelativeLayout>
 
     <LinearLayout

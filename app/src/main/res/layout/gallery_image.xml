@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingVertical="4dp"
-    android:src="@drawable/gallery_img4"
+    android:src="@drawable/gallery_img"
     android:scaleType="fitXY"
     android:adjustViewBounds="true"
     android:contentDescription="@string/todo"/>

@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -33,11 +34,11 @@ public class EditProfile extends AppCompatActivity {
     private ImageView ivProfile;
     private TextView tvChangeProfilePhoto;
     private EditText etName, etCity;
-    private String id, name, city, profile_url;
+    private User user;
     private String updatedName, updatedCity, updatedProfile;
 
     private ProgressDialog pd;
-    private static AlertDialog dialog;
+    private static BottomSheetDialog dialog;
     private static File file;
     private static Uri imageUri;
 
@@ -55,16 +56,13 @@ public class EditProfile extends AppCompatActivity {
 
         btnBack.setOnClickListener(view -> onBackPressed());
 
-        SharedPreferences sp = getSharedPreferences(Utils.LOGIN_SHARED_FILE, MODE_PRIVATE);
-        id = Utils.getID(sp.getString("email", null));
-        name = sp.getString("name", null);
-        city = sp.getString("city", null);
-        profile_url = sp.getString("profile_url", null);
-        etName.setText(name);
-        etCity.setText(city);
-        Picasso.get().load(profile_url).into(ivProfile);
+        user = Utils.getUserFromSharedPreferences(this);
 
-        dialog = Utils.pickDialog(this);
+        etName.setText(user.getName());
+        etCity.setText(user.getCity());
+        Picasso.get().load(user.getProfile_url()).into(ivProfile);
+
+        dialog = Utils.imagePickDialog(this);
         ivProfile.setOnClickListener(view -> dialog.show());
         tvChangeProfilePhoto.setOnClickListener(view -> dialog.show());
 
@@ -92,14 +90,15 @@ public class EditProfile extends AppCompatActivity {
         updatedName = etName.getText().toString().trim();
         updatedCity = etCity.getText().toString().trim();
 
-        if(validateData(updatedName, updatedCity) && (!updatedName.equals(name) || !updatedCity.equals(city) || updatedProfile != null)) {
+        if(validateData(updatedName, updatedCity) &&
+                (!updatedName.equals(user.getName()) || !updatedCity.equals(user.getCity()) || updatedProfile != null)) {
 
-            pd = Utils.progressDialog(this, "Updating...");
+            pd = Utils.progressDialog(this, "Updating profile...");
             pd.show();
 
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             db.collection("users")
-                .document(id)
+                .document(Utils.getID(user.getEmail()))
                 .get()
                 .addOnSuccessListener(document -> {
                     User user = document.toObject(User.class);
@@ -124,7 +123,7 @@ public class EditProfile extends AppCompatActivity {
             byte[] bytes = Utils.compressImage(this, imageUri);
 
             FirebaseStorage storage = FirebaseStorage.getInstance();
-            StorageReference reference = storage.getReference().child("imagegallery-ks/" + id + "_profile");
+            StorageReference reference = storage.getReference().child("imagegallery-ks/" + Utils.getID(user.getEmail()) + "_profile");
             reference.putBytes(bytes)
                 .addOnSuccessListener(snapshot -> {
                     reference.getDownloadUrl()
@@ -148,7 +147,7 @@ public class EditProfile extends AppCompatActivity {
     private void updateUserDataToFirestore(User user) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("users")
-            .document(id)
+            .document(Utils.getID(user.getEmail()))
             .set(user)
             .addOnSuccessListener(unused -> {
                 Utils.toast(this, "Profile Updated...");
@@ -200,7 +199,7 @@ public class EditProfile extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if(!etName.getText().toString().equals(name) || !etCity.getText().toString().equals(city) || updatedProfile != null) {
+        if(!etName.getText().toString().equals(user.getName()) || !etCity.getText().toString().equals(user.getCity()) || updatedProfile != null) {
             new AlertDialog.Builder(this)
                     .setTitle("Confirmation")
                     .setMessage("Unsaved changes?")

@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.mca.imagegallery.Model.User;
+import com.mca.imagegallery.helper.Crypto;
 import com.mca.imagegallery.helper.Utils;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -43,12 +44,12 @@ public class RegisterActivity extends AppCompatActivity {
             String password = etPassword.getText().toString().trim();
 
             if(validateData(name, email, city, password)) {
-                User user = new User(name, city, email, password);
+                User user = new User(name, city, email, Crypto.encrypt(password));
                 newRegistration(user);
             }
         });
 
-        linkLogin.setOnClickListener(view -> startActivity(new Intent(this, LoginActivity.class).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)));
+        linkLogin.setOnClickListener(view -> Utils.startActivity(this, LoginActivity.class));
 
         db = FirebaseFirestore.getInstance();
     }
@@ -97,10 +98,9 @@ public class RegisterActivity extends AppCompatActivity {
 
         pd = Utils.progressDialog(this, "Please wait...");
         pd.show();
-        String id = Utils.getID(user.getEmail());
 
         db.collection("users")
-            .document(id)
+            .document(Utils.getID(user.getEmail()))
             .get()
             .addOnCompleteListener(task -> {
                 if(task.isSuccessful()) {

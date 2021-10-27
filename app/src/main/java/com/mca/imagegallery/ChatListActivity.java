@@ -15,14 +15,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.mca.imagegallery.Model.Message;
 import com.mca.imagegallery.Model.User;
+import com.mca.imagegallery.helper.Crypto;
 import com.mca.imagegallery.helper.NavMenu;
 import com.mca.imagegallery.helper.Permissions;
 import com.mca.imagegallery.helper.Utils;
 import com.squareup.picasso.Picasso;
 
 public class ChatListActivity extends AppCompatActivity {
-    private LinearLayout chatCard;
+
     private LinearLayout chatCardContainer;
     private ProgressBar progressBar;
 
@@ -44,7 +46,8 @@ public class ChatListActivity extends AppCompatActivity {
     }
 
     private void listUsers() {
-        String id = Utils.getID(getSharedPreferences(Utils.LOGIN_SHARED_FILE, MODE_PRIVATE).getString("email", null));
+
+        String id =  Utils.getID((Utils.getUserFromSharedPreferences(this).getEmail()));
         progressBar.setVisibility(View.VISIBLE);
 
         database.getReference()
@@ -54,7 +57,12 @@ public class ChatListActivity extends AppCompatActivity {
                 if(task.isSuccessful()) {
                     Iterable<DataSnapshot> users = task.getResult().getChildren();
                     for (DataSnapshot snapshot : users) {
-                        setChatUser(snapshot.getKey());
+                        Iterable<DataSnapshot> messages = snapshot.getChildren();
+                        Message recentMessage = null;
+                        for (DataSnapshot dss : messages) {
+                            recentMessage = dss.getValue(Message.class);
+                        }
+                        setChatUser(snapshot.getKey(), recentMessage);
                     }
                 } else {
                     Utils.toast(this, task.getException().getMessage());
@@ -67,7 +75,7 @@ public class ChatListActivity extends AppCompatActivity {
             });
     }
 
-    private void setChatUser(String id) {
+    private void setChatUser(String id, Message recentMessage) {
 
         db.collection("users")
             .document(id)
@@ -75,7 +83,7 @@ public class ChatListActivity extends AppCompatActivity {
                 .addOnCompleteListener(task -> {
                     if(task.isSuccessful()) {
                         User user = task.getResult().toObject(User.class);
-                        addUserCard(user);
+                        addUserCard(user, recentMessage);
                     }
                     else {
                         Utils.toast(this, task.getException().getMessage());
@@ -84,19 +92,26 @@ public class ChatListActivity extends AppCompatActivity {
                 .addOnFailureListener(ex -> Utils.toast(this, ex.getMessage()));
     }
 
-    private void addUserCard(User user) {
-        chatCard = (LinearLayout) getLayoutInflater().inflate(R.layout.chat_card, null);
+    private void addUserCard(User user, Message recentMessage) {
+        LinearLayout chatCard = (LinearLayout) getLayoutInflater().inflate(R.layout.chat_card, null);
         ImageView ivProfile = chatCard.findViewById(R.id.iv_profile);
         TextView tvName = chatCard.findViewById(R.id.tv_name);
+        TextView tvRecentMessage = chatCard.findViewById(R.id.tv_recent_message);
+
         Picasso.get().load(user.getProfile_url()).into(ivProfile);
         tvName.setText(user.getName());
+        if(recentMessage != null) {
+            String msg = Crypto.decrypt(recentMessage.getMessage());
+            if(recentMessage.getType().equals("out")) {
+                tvRecentMessage.setText("You: " + msg);
+            } else {
+                tvRecentMessage.setText(user.getName() + ": " + msg);
+            }
+        }
 
         chatCard.setOnClickListener(view -> {
             Intent intent = new Intent(this, ChatActivity.class);
-            intent.putExtra("email", user.getEmail());
-            intent.putExtra("name", user.getName());
-            intent.putExtra("city", user.getCity());
-            intent.putExtra("profile_url", user.getProfile_url());
+            intent = Utils.addUserToIntent(intent, user);
             startActivity(intent);
         });
         chatCardContainer.addView(chatCard);

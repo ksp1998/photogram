@@ -10,7 +10,7 @@
         android:id="@+id/iv_home_img"
         android:layout_width="380dp"
         android:layout_height="380dp"
-        android:src="@drawable/home_img4"
+        android:src="@drawable/home_img"
         android:scaleType="centerCrop"
         android:contentDescription="@string/todo"
         android:paddingEnd="0dp" />

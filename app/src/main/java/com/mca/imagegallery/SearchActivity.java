@@ -102,10 +102,7 @@ public class SearchActivity extends AppCompatActivity {
     private void gotoProfile(User user) {
 
         Intent intent = new Intent(this, MyProfileActivity.class);
-        intent.putExtra("profile_url", user.getProfile_url());
-        intent.putExtra("name", user.getName());
-        intent.putExtra("city", user.getCity());
-        intent.putExtra("email", user.getEmail());
+        intent = Utils.addUserToIntent(intent, user);
         intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
     }

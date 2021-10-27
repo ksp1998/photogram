@@ -15,28 +15,24 @@
 
     <EditText
         android:id="@+id/et_name"
-        android:text="@string/user"
         android:hint="@string/name_hint"
         android:inputType="textPersonName"
         style="@style/input_text" />
 
     <EditText
         android:id="@+id/et_city"
-        android:text="@string/user_city"
         android:hint="@string/city_hint"
         android:inputType="textPersonName"
         style="@style/input_text" />
 
     <EditText
         android:id="@+id/et_email"
-        android:text="@string/example_email"
         android:hint="@string/email_hint"
         android:inputType="textEmailAddress"
         style="@style/input_text" />
 
     <EditText
         android:id="@+id/et_password"
-        android:text="@string/example_password"
         android:hint="@string/password_hint"
         android:inputType="textPassword"
         style="@style/input_text" />

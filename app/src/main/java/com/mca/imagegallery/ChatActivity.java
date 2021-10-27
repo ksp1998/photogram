@@ -21,7 +21,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.firebase.Timestamp;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -29,6 +28,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.mca.imagegallery.Model.Message;
 import com.mca.imagegallery.Model.User;
+import com.mca.imagegallery.helper.Crypto;
 import com.mca.imagegallery.helper.Utils;
 import com.squareup.picasso.Picasso;
 
@@ -41,7 +41,7 @@ public class ChatActivity extends AppCompatActivity {
     private ScrollView scroller;
     private ProgressBar progressBar;
     private String receiverId, senderId, receiverProfile, senderProfile;
-    private String name, city, email, profile_url;
+    private User user;
 
     private FirebaseDatabase database;
     private DatabaseReference reference;
@@ -58,21 +58,16 @@ public class ChatActivity extends AppCompatActivity {
         scroller = findViewById(R.id.scroller);
         progressBar = findViewById(R.id.progress_bar);
 
+        user = Utils.getUserFromIntent(this);
 
-        name = getIntent().getStringExtra("name");
-        email = getIntent().getStringExtra("email");
-        city = getIntent().getStringExtra("city");
-        profile_url = getIntent().getStringExtra("profile_url");
-
-
-        tvTitle.setText(name);
+        tvTitle.setText(user.getName());
         tvTitle.setOnClickListener(view -> gotoProfile());
-        btnBack.setOnClickListener(view -> super.onBackPressed());
+        btnBack.setOnClickListener(view -> onBackPressed());
         btnSend.setOnClickListener(view -> sendMessage());
 
-        receiverId = Utils.getID(email);
+        receiverId = Utils.getID(user.getEmail());
         senderId = Utils.getID(getSharedPreferences(Utils.LOGIN_SHARED_FILE, MODE_PRIVATE).getString("email", null));
-        receiverProfile = profile_url;
+        receiverProfile = user.getProfile_url();
         senderProfile = getSharedPreferences(Utils.LOGIN_SHARED_FILE, MODE_PRIVATE).getString("profile_url", null);
 
         database = FirebaseDatabase.getInstance();
@@ -82,10 +77,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private void gotoProfile() {
         Intent intent = new Intent(this, MyProfileActivity.class);
-        intent.putExtra("profile_url", profile_url);
-        intent.putExtra("name", name);
-        intent.putExtra("city", city);
-        intent.putExtra("email", email);
+        intent = Utils.addUserToIntent(intent, user);
         intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
     }
@@ -93,10 +85,11 @@ public class ChatActivity extends AppCompatActivity {
     private void sendMessage() {
         String text = inputMessage.getText().toString().trim();
         if(!text.equals("")) {
+
             long id = System.currentTimeMillis();
 
             String time = String.valueOf(System.currentTimeMillis());
-            Message message = new Message(id, text, Timestamp.now().toString(), "out");
+            Message message = new Message(id, Crypto.encrypt(text), "out");
 
             reference = database.getReference().child(senderId).child(receiverId).child(time);
             reference.setValue(message)
@@ -107,7 +100,7 @@ public class ChatActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(ex -> Utils.toast(this, ex.getMessage()));
 
-            message = new Message(id, text, Timestamp.now().toString(), "in");
+            message = new Message(id, Crypto.encrypt(text), "in");
             reference = database.getReference().child(receiverId).child(senderId).child(time);
             reference.setValue(message)
                 .addOnFailureListener(ex -> Utils.toast(this, ex.getMessage()));
@@ -144,7 +137,7 @@ public class ChatActivity extends AppCompatActivity {
     private void addMessage(Message message) {
         int layout;
         String profileUrl;
-        if(message.getIn_out().equals("in")) {
+        if(message.getType().equals("in")) {
             layout = R.layout.message_received;
             profileUrl = receiverProfile;
         } else {
@@ -153,7 +146,7 @@ public class ChatActivity extends AppCompatActivity {
         }
         RelativeLayout messageCard = (RelativeLayout) getLayoutInflater().inflate(layout, null);
         TextView tvMessage  = messageCard.findViewById(R.id.message);
-        tvMessage.setText(message.getMessage());
+        tvMessage.setText(Crypto.decrypt(message.getMessage()));
         tvMessage.setTag(message);
         registerForContextMenu(tvMessage);
         ImageView ivProfile = messageCard.findViewById(R.id.iv_profile);
@@ -170,6 +163,9 @@ public class ChatActivity extends AppCompatActivity {
         inflater.inflate(R.menu.message_options_menu, menu);
 
         message = (Message) v.getTag();
+        if(message.getType().equals("in")) {
+            menu.findItem(R.id.delete_for_both).setEnabled(false);
+        }
     }
 
     @Override
@@ -178,7 +174,7 @@ public class ChatActivity extends AppCompatActivity {
         switch(item.getItemId()) {
             case R.id.copy:
                 ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-                ClipData data = ClipData.newPlainText("message", message.getMessage());
+                ClipData data = ClipData.newPlainText("message", Crypto.decrypt(message.getMessage()));
                 clipboard.setPrimaryClip(data);
                 Utils.toast(this, "Message copied!");
                 break;

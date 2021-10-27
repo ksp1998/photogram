@@ -1,9 +1,7 @@
 package com.mca.imagegallery;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
@@ -23,6 +21,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.storage.FirebaseStorage;
 import com.mca.imagegallery.Model.Image;
+import com.mca.imagegallery.Model.User;
 import com.mca.imagegallery.helper.NavMenu;
 import com.mca.imagegallery.helper.Permissions;
 import com.mca.imagegallery.helper.Utils;
@@ -37,7 +36,7 @@ public class MyProfileActivity extends AppCompatActivity {
     private ImageButton btnLogout;
     private LinearLayout userGalleryLeft;
     private LinearLayout userGalleryRight;
-    private String email, name, city, profile_url;
+    private User user;
     private boolean otherUserProfile = false;
 
     private FirebaseFirestore db;
@@ -60,30 +59,25 @@ public class MyProfileActivity extends AppCompatActivity {
         userGalleryLeft = findViewById(R.id.user_gallery_left);
         userGalleryRight = findViewById(R.id.user_gallery_right);
 
-        SharedPreferences sp = getSharedPreferences(Utils.LOGIN_SHARED_FILE, MODE_PRIVATE);
-        email = sp.getString("email", null);
+        user = Utils.getUserFromSharedPreferences(this);
 
-        String temp = null;
+        String email = null;
         if(getIntent().getStringExtra("email") != null) {
-            temp = getIntent().getStringExtra("email");
+            email = getIntent().getStringExtra("email");
         }
 
-        if(temp != null && !temp.equals(email)) {
-            email = temp;
+        if(email != null && !email.equals(user.getEmail())) {
+            user.setEmail(email);
             otherUserData();
         }
         else {
-            name = sp.getString("name", null);
-            city = sp.getString("city", null);
-            profile_url = sp.getString("profile_url", null);
-
             btnLogout.setOnClickListener(view -> confirmDialog());
             btnEdit.setOnClickListener(view -> startActivity(new Intent(this, EditProfile.class)));
         }
 
-        Picasso.get().load(profile_url).into(ivProfile);
-        tvName.setText(name);
-        tvCity.setText(city);
+        Picasso.get().load(user.getProfile_url()).into(ivProfile);
+        tvName.setText(user.getName());
+        tvCity.setText(user.getCity());
 
         db = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance();
@@ -93,9 +87,7 @@ public class MyProfileActivity extends AppCompatActivity {
 
     private void otherUserData() {
         otherUserProfile = true;
-        profile_url = getIntent().getStringExtra("profile_url");
-        name = getIntent().getStringExtra("name");
-        city = getIntent().getStringExtra("city");
+        user = Utils.getUserFromIntent(this);
 
         btnBack.setVisibility(View.VISIBLE);
         btnLogout.setVisibility(View.GONE);
@@ -105,10 +97,7 @@ public class MyProfileActivity extends AppCompatActivity {
         btnBack.setOnClickListener(view -> onBackPressed());
         btnMessage.setOnClickListener(view -> {
             Intent intent = new Intent(this, ChatActivity.class);
-            intent.putExtra("name", name);
-            intent.putExtra("email", email);
-            intent.putExtra("city", city);
-            intent.putExtra("profile_url", profile_url);
+            intent = Utils.addUserToIntent(intent, user);
             startActivity(intent);
         });
     }
@@ -116,18 +105,15 @@ public class MyProfileActivity extends AppCompatActivity {
     private void confirmDialog() {
         new AlertDialog.Builder(this)
             .setTitle("Logout")
-            .setMessage("Are you sure?")
             .setIcon(R.drawable.logo)
+            .setMessage("Are you sure?")
             .setPositiveButton("YES", (dialog, which) -> logout())
             .setNegativeButton("NO", null)
             .show();
     }
 
     private void logout() {
-        SharedPreferences sp = getSharedPreferences(Utils.LOGIN_SHARED_FILE, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sp.edit();
-        editor.clear();
-        editor.apply();
+        Utils.clearLoginPreferences(this);
         startActivity(new Intent(this, MainActivity.class));
     }
 
@@ -136,7 +122,7 @@ public class MyProfileActivity extends AppCompatActivity {
         userGalleryRight.removeAllViews();
 
         db.collection("users")
-            .document(Utils.getID(email))
+            .document(Utils.getID(user.getEmail()))
             .collection("images")
             .orderBy("id", Query.Direction.DESCENDING)
             .get()
@@ -168,9 +154,9 @@ public class MyProfileActivity extends AppCompatActivity {
     private void viewImage(Image image) {
         Intent intent = new Intent(this, ViewImageActivity.class);
         intent.putExtra("activity", "MyProfile");
-        intent.putExtra("profile_url", profile_url);
-        intent.putExtra("name", name);
-        intent.putExtra("email", email);
+        intent.putExtra("profile_url", user.getProfile_url());
+        intent.putExtra("name", user.getName());
+        intent.putExtra("email", user.getEmail());
         intent.putExtra("image_url", image.getUrl());
         startActivity(intent, Utils.getAnimationBundle(this));
     }
@@ -187,7 +173,6 @@ public class MyProfileActivity extends AppCompatActivity {
         NavMenu.onActivityResult(requestCode, resultCode, data);
     }
 
-    // overridden method to inflate context menu
     ImageView imageView;
     Image image;
     @Override
@@ -224,12 +209,12 @@ public class MyProfileActivity extends AppCompatActivity {
 
     private void deleteUserImage() {
         db.collection("users")
-            .document(Utils.getID(email))
+            .document(Utils.getID(user.getEmail()))
             .collection("images")
             .document(String.valueOf(image.getId()))
             .delete()
             .addOnCompleteListener(task -> {
-                deleteUserImageFromFireStoreImages();
+                deleteUserImageFromFirestoreImages();
                 deleteUserImageFromFirebaseStorage();
                 imageView.setVisibility(View.GONE);
                 Utils.toast(this, "Image deleted!");
@@ -237,7 +222,7 @@ public class MyProfileActivity extends AppCompatActivity {
             .addOnFailureListener(ex -> Utils.toast(this, ex.getMessage()));
     }
 
-    private void deleteUserImageFromFireStoreImages() {
+    private void deleteUserImageFromFirestoreImages() {
         db.collection("images")
             .document(String.valueOf(image.getId()))
             .delete()
@@ -247,7 +232,7 @@ public class MyProfileActivity extends AppCompatActivity {
     private void deleteUserImageFromFirebaseStorage() {
         storage.getReference()
             .child("imagegallery-ks")
-            .child(Utils.getID(email))
+            .child(Utils.getID(user.getEmail()))
             .child(String.valueOf(image.getId()))
             .delete()
             .addOnFailureListener(ex -> Utils.toast(this, ex.getMessage()));
@@ -257,14 +242,11 @@ public class MyProfileActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if(otherUserProfile) return;
-        SharedPreferences sp = getSharedPreferences(Utils.LOGIN_SHARED_FILE, MODE_PRIVATE);
-        name = sp.getString("name", null);
-        city = sp.getString("city", null);
-        profile_url = sp.getString("profile_url", null);
+        user = Utils.getUserFromSharedPreferences(this);
 
-        Picasso.get().load(profile_url).into(ivProfile);
-        tvName.setText(name);
-        tvCity.setText(city);
+        Picasso.get().load(user.getProfile_url()).into(ivProfile);
+        tvName.setText(user.getName());
+        tvCity.setText(user.getCity());
     }
 
     @Override

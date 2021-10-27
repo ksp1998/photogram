@@ -14,6 +14,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.mca.imagegallery.Model.User;
 import com.mca.imagegallery.helper.Utils;
 import com.squareup.picasso.Picasso;
 
@@ -23,7 +24,8 @@ public class ViewImageActivity extends AppCompatActivity {
     private TextView tvName, tvUserId;
     private Button btnClose;
     private RelativeLayout profileCard;
-    private String profile_url, name, city, email, image_url;
+    private String image_url;
+    private User user;
 
     int i = 1;
 
@@ -40,10 +42,7 @@ public class ViewImageActivity extends AppCompatActivity {
         btnClose = findViewById(R.id.btn_close);
         profileCard = findViewById(R.id.profile_card);
 
-        profile_url = getIntent().getStringExtra("profile_url");
-        name = getIntent().getStringExtra("name");
-        city = getIntent().getStringExtra("city");
-        email = getIntent().getStringExtra("email");
+        user = Utils.getUserFromIntent(this);
         image_url = getIntent().getStringExtra("image_url");
 
         btnClose.setOnClickListener(view -> onBackPressed());
@@ -60,9 +59,9 @@ public class ViewImageActivity extends AppCompatActivity {
     }
 
     private void loadImage() {
-        Picasso.get().load(profile_url).into(ivProfile);
-        tvName.setText(name);
-        tvUserId.setText("@".concat(email.substring(0, email.lastIndexOf('@'))));
+        Picasso.get().load(user.getProfile_url()).into(ivProfile);
+        tvName.setText(user.getName());
+        tvUserId.setText("@".concat(user.getEmail().substring(0, user.getEmail().lastIndexOf('@'))));
         Picasso.get().load(image_url).into(imageView);
     }
 
@@ -73,10 +72,7 @@ public class ViewImageActivity extends AppCompatActivity {
         }
 
         Intent intent = new Intent(this, MyProfileActivity.class);
-        intent.putExtra("profile_url", profile_url);
-        intent.putExtra("name", name);
-        intent.putExtra("city", city);
-        intent.putExtra("email", email);
+        intent = Utils.addUserToIntent(intent, user);
         intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
     }
