@@ -53,6 +53,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:text="@string/recent_message_example_text"
+            android:singleLine="true"
             android:lineSpacingExtra="3sp"
             android:translationY="-1.38sp"
             android:fontFamily="@font/roboto" />

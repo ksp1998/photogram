@@ -1,9 +1,9 @@
 package com.mca.imagegallery;
 
-import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
@@ -19,13 +19,14 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.mca.imagegallery.Model.Message;
 import com.mca.imagegallery.Model.User;
 import com.mca.imagegallery.helper.Crypto;
@@ -72,7 +73,7 @@ public class ChatActivity extends AppCompatActivity {
 
         database = FirebaseDatabase.getInstance();
 
-        receiveMessage();
+        listMessages();
     }
 
     private void gotoProfile() {
@@ -87,12 +88,11 @@ public class ChatActivity extends AppCompatActivity {
         if(!text.equals("")) {
 
             long id = System.currentTimeMillis();
-
-            String time = String.valueOf(System.currentTimeMillis());
             Message message = new Message(id, Crypto.encrypt(text), "out");
 
-            reference = database.getReference().child(senderId).child(receiverId).child(time);
-            reference.setValue(message)
+            reference = database.getReference().child(senderId).child(receiverId);
+            reference.child(String.valueOf(id))
+                .setValue(message)
                 .addOnCompleteListener(task -> {
                     // Utils.toast(this, "Message sent...");
                     inputMessage.getText().clear();
@@ -101,37 +101,51 @@ public class ChatActivity extends AppCompatActivity {
                 .addOnFailureListener(ex -> Utils.toast(this, ex.getMessage()));
 
             message = new Message(id, Crypto.encrypt(text), "in");
-            reference = database.getReference().child(receiverId).child(senderId).child(time);
-            reference.setValue(message)
+            reference = database.getReference().child(receiverId).child(senderId);
+            reference.child(String.valueOf(id))
+                .setValue(message)
                 .addOnFailureListener(ex -> Utils.toast(this, ex.getMessage()));
         }
     }
 
-    private void receiveMessage() {
-        final Activity activity = this;
+    private String previousMessageDate;
+    private void listMessages() {
+        chatContainer.removeAllViews();
         progressBar.setVisibility(View.VISIBLE);
+        previousMessageDate = null;
 
-        reference = database.getReference().child(senderId).child(receiverId);
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                listMessages(snapshot.getChildren());
-                progressBar.setVisibility(View.GONE);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Utils.toast(activity, error.getMessage());
-            }
-        });
+        receiveMessages();
     }
 
-    private void listMessages(Iterable<DataSnapshot> data) {
-        chatContainer.removeAllViews();
-        for (DataSnapshot snapshot : data) {
-            Message message = snapshot.getValue(Message.class);
-            addMessage(message);
-        }
+    private void receiveMessages() {
+
+        reference = database.getReference().child(senderId).child(receiverId);
+        reference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                Message message = snapshot.getValue(Message.class);
+                addMessage(message);
+                scroller.fullScroll(View.FOCUS_DOWN);
+            }
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+                TextView deletedMessage = chatContainer
+                        .findViewWithTag(snapshot.child("id").getValue())
+                        .findViewById(R.id.message);
+                if(deletedMessage != null) {
+                    deletedMessage.setTextColor(Color.RED);
+                    deletedMessage.setText("deleted");
+                    unregisterForContextMenu(deletedMessage);
+                }
+            }
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
     }
 
     private void addMessage(Message message) {
@@ -145,14 +159,29 @@ public class ChatActivity extends AppCompatActivity {
             profileUrl = senderProfile;
         }
         RelativeLayout messageCard = (RelativeLayout) getLayoutInflater().inflate(layout, null);
+
         TextView tvMessage  = messageCard.findViewById(R.id.message);
         tvMessage.setText(Crypto.decrypt(message.getMessage()));
         tvMessage.setTag(message);
+        // tvMessage.setContentDescription(""+message.getId());
+        messageCard.setTag(message.getId());
         registerForContextMenu(tvMessage);
+
         ImageView ivProfile = messageCard.findViewById(R.id.iv_profile);
         Picasso.get().load(profileUrl).into(ivProfile);
+
+        String date = Utils.getDate(message.getId());
+        if(previousMessageDate == null || !previousMessageDate.equals(date)) {
+            TextView tvDate = messageCard.findViewById(R.id.tv_date);
+            tvDate.setText(date);
+            tvDate.setVisibility(View.VISIBLE);
+        }
+        previousMessageDate = date;
+
+        TextView tvTime = messageCard.findViewById(R.id.tv_time);
+        tvTime.setText(Utils.getTime(message.getId()));
         chatContainer.addView(messageCard);
-        scroller.fullScroll(View.FOCUS_DOWN);
+        scroller.arrowScroll(View.FOCUS_DOWN);
     }
 
     Message message;

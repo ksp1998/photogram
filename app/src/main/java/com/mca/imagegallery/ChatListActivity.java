@@ -13,7 +13,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.mca.imagegallery.Model.Message;
 import com.mca.imagegallery.Model.User;
@@ -22,6 +24,10 @@ import com.mca.imagegallery.helper.NavMenu;
 import com.mca.imagegallery.helper.Permissions;
 import com.mca.imagegallery.helper.Utils;
 import com.squareup.picasso.Picasso;
+
+import java.util.HashMap;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class ChatListActivity extends AppCompatActivity {
 
@@ -50,28 +56,34 @@ public class ChatListActivity extends AppCompatActivity {
         String id =  Utils.getID((Utils.getUserFromSharedPreferences(this).getEmail()));
         progressBar.setVisibility(View.VISIBLE);
 
-        database.getReference()
-            .child(id)
-            .get()
-            .addOnCompleteListener(task -> {
-                if(task.isSuccessful()) {
-                    Iterable<DataSnapshot> users = task.getResult().getChildren();
-                    for (DataSnapshot snapshot : users) {
-                        Iterable<DataSnapshot> messages = snapshot.getChildren();
+        database.getReference().child(id).orderByChild("time")
+            .addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    chatCardContainer.removeAllViews();
+                    Iterable<DataSnapshot> chatUsers = snapshot.getChildren();
+                    SortedMap<Long, HashMap<String, Message>> map = new TreeMap<>();
+
+                    for (DataSnapshot chatUser : chatUsers) {
+                        Iterable<DataSnapshot> messages = chatUser.getChildren();
                         Message recentMessage = null;
                         for (DataSnapshot dss : messages) {
                             recentMessage = dss.getValue(Message.class);
                         }
-                        setChatUser(snapshot.getKey(), recentMessage);
+                        HashMap<String, Message> values = new HashMap<>();
+                        values.put(chatUser.getKey(), recentMessage);
+                        map.put(recentMessage.getId(), values);
                     }
-                } else {
-                    Utils.toast(this, task.getException().getMessage());
+
+                    for (HashMap<String, Message> maps : map.values()) {
+                        String key = maps.keySet().toArray()[0].toString();
+                        Message message = (Message) maps.values().toArray()[0];
+                        setChatUser(key, message);
+                    }
                 }
-                progressBar.setVisibility(View.GONE);
-            })
-            .addOnFailureListener(ex -> {
-                Utils.toast(this, ex.getMessage());
-                progressBar.setVisibility(View.GONE);
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {}
             });
     }
 
@@ -80,16 +92,16 @@ public class ChatListActivity extends AppCompatActivity {
         db.collection("users")
             .document(id)
             .get()
-                .addOnCompleteListener(task -> {
-                    if(task.isSuccessful()) {
-                        User user = task.getResult().toObject(User.class);
-                        addUserCard(user, recentMessage);
-                    }
-                    else {
-                        Utils.toast(this, task.getException().getMessage());
-                    }
-                })
-                .addOnFailureListener(ex -> Utils.toast(this, ex.getMessage()));
+            .addOnCompleteListener(task -> {
+                if(task.isSuccessful()) {
+                    User user = task.getResult().toObject(User.class);
+                    addUserCard(user, recentMessage);
+                }
+                else {
+                    Utils.toast(this, task.getException().getMessage());
+                }
+            })
+            .addOnFailureListener(ex -> Utils.toast(this, ex.getMessage()));
     }
 
     private void addUserCard(User user, Message recentMessage) {
@@ -114,7 +126,7 @@ public class ChatListActivity extends AppCompatActivity {
             intent = Utils.addUserToIntent(intent, user);
             startActivity(intent);
         });
-        chatCardContainer.addView(chatCard);
+        chatCardContainer.addView(chatCard, 0);
     }
 
     @Override

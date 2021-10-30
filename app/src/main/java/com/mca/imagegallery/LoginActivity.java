@@ -38,6 +38,7 @@ public class LoginActivity extends AppCompatActivity {
         String recentUserEmail = getIntent().getStringExtra("email");
         if(recentUserEmail != null) {
             etEmail.setText(recentUserEmail);
+            etPassword.getText().clear();
         }
 
         db = FirebaseFirestore.getInstance();

@@ -29,6 +29,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Utils {
 
@@ -166,10 +169,22 @@ public class Utils {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
             fos.close();
 
-            Utils.toast(activity, "Image saved to gallery...");
+            toast(activity, "Image saved to gallery...");
         }
         catch (IOException ex) {
-            Utils.toast(activity, ex.getMessage());
+            toast(activity, ex.getMessage());
         }
+    }
+
+    public static String getDate(long milliseconds) {
+        Date date = new Date(milliseconds);
+        DateFormat formatter = new SimpleDateFormat("MMMM dd, yyyy");
+        return formatter.format(date);
+    }
+
+    public static String getTime(long milliseconds) {
+        Date date = new Date(milliseconds);
+        DateFormat formatter = new SimpleDateFormat("hh:mm aa");
+        return formatter.format(date);
     }
 }
